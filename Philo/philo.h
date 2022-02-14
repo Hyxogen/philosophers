@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 09:28:59 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/10 09:28:09 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/14 13:13:56 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,17 +29,17 @@ typedef struct s_philo_attribs {
 }	t_philo_attribs;
 
 typedef struct s_philo {
-	int			m_id;
-	int			m_philo_count;
-	int			m_death_time;
-	int			m_sleep_time;
-	int			m_eat_time;
-	int			m_eat_count;
-	int			m_min_eat;
-	int			m_cycle;
-	t_fork		m_lfork;
-	t_fork		m_rfork;
-	pthread_t	*m_thread;
+	int			id;
+	int			philo_count;
+	int			death_time;
+	int			sleep_time;
+	int			eat_time;
+	int			eat_count;
+	int			min_eat;
+	int			cycle;
+	t_fork		lfork;
+	t_fork		rfork;
+	pthread_t	*thread;
 }	t_philo;
 
 void			_philo_init_variables(t_philo *philo,
