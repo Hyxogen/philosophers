@@ -1,4 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        ::::::::            */
+/*   philo_routine.c                                    :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2022/02/21 14:27:20 by dmeijer       #+#    #+#                 */
+/*   Updated: 2022/02/21 14:39:13 by dmeijer       ########   odam.nl         */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
+
+#include <sys/time.h>
 
 #define PHILO_INTER 50
 
@@ -10,8 +24,8 @@ int
 	suseconds_t	sleep_time;
 
 	now = philo_get_timestamp();
-	death_time = now + (philo->death_time - now + philo->last_eat);
-	sleep_time = now + philo->sleep_time;
+	death_time = now + (philo->attrib->death_time - now + philo->last_eat);
+	sleep_time = now + philo->attrib->sleep_time;
 	while (now < sleep_time)
 	{
 		if (philo_is_dead(philo))
@@ -26,7 +40,7 @@ int
 	}
 	if (philo_is_dead(philo))
 	{
-		philo_inform(philo, PHILO_DEATH);
+		philo_inform(philo, philo_die);
 		return (0);
 	}
 	return (1);
@@ -36,18 +50,18 @@ void
 	philo_drop(t_philo *philo, t_fork *fork)
 {
 	pthread_mutex_lock(fork->mtx);
-	fork->owner = NULL;
+	fork->user = NULL;
 	pthread_mutex_unlock(fork->mtx);
-	philo_inform(philo, PHILO_DROP_FORK);
+	philo_inform(philo, philo_drop_fork);
 }
 
 void
 	philo_eat(t_philo *philo)
 {
-	philo->state = PHILO_EATING;
-	philo_inform(philo, PHILO_EATING);
-	usleep(1000 * philo->eat_time);
-	philo->last_eat = philo_get_timestamp();
+	philo->state = philo_eating;
+	philo_inform(philo, philo_start_eat);
+	usleep(1000 * philo->attrib->eat_time);
+	philo->last_eat = philo->last_eat + philo->attrib->eat_time;
 	philo_drop(philo, philo->lfork);
 	philo_drop(philo, philo->rfork);
 }
@@ -59,14 +73,14 @@ int
 
 	success = 0;
 	pthread_mutex_lock(fork->mtx);
-	if (fork->owner == NULL || fork->owner == philo)
+	if (fork->user == NULL || fork->user == philo)
 	{
-		fork->owner = philo;
+		fork->user = philo;
 		success = 1;
 	}
 	pthread_mutex_unlock(fork->mtx);
 	if (success)
-		philo_inform(philo, PHILO_TAKE_FORK);
+		philo_inform(philo, philo_take_fork);
 	return (success);
 
 int
@@ -83,16 +97,16 @@ int
 void
 	philo_think(t_philo *philo)
 {
-	if (philo->state == PHILO_THINKING)
+	if (philo->state == philo_thinking)
 		return ;
-	philo->state = PHILO_THINKING;
-	philo_inform(philo, PHILO_THINKING);
+	philo->state = philo_thinking;
+	philo_inform(philo, philo_start_think);
 }
 
 void
 	philo_should_stop(t_philo *philo)
 {
-	return (philo_is_dead(philo) || philo->state == PHILO_ERR);
+	return (philo_is_dead(philo) || philo->state == philo_err);
 }
 
 void
