@@ -1,40 +1,43 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   philo_setup.c                                      :+:    :+:            */
+/*   setup.c                                            :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 09:42:54 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/21 14:26:17 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/25 10:20:53 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 #include <string.h>
+#include <stdlib.h>
 
 void
-	_philo_init_variables(t_philo *philo,
-			int number, int philo_count, t_philo_settings settings) {
-	philo->m_id = number;
-	philo->m_philo_count = philo_count;
-	philo->m_settings = settings;
+	fork_new(t_fork *fork)
+{
+	fork->user = NULL;
+	fork->mtx = malloc(sizeof(*fork->mtx));
+	pthread_mutex_init(fork->mtx, NULL);
 }
 
 t_bool
 	_philo_create_thread(t_philo *philo)
 {
-	if (pthread_create(&philo->m_thread, NULL, philo_run, philo) == 0)
+	if (pthread_create(philo->thread, NULL, philo_run, philo) == 0)
 		return (TRUE);
 	return (FALSE);
 }
 
-t_philo
-	*philo_create(int number, int philo_count, t_philo_settings settings) {
-	t_philo	*philo;
-
-	philo = malloc(sizeof(t_philo));
-	if (philo == NULL)
-		return (NULL);
-	_philo_init_variables(philo, number, philo_count, settings);
+void
+	*philo_new(t_philo *philo, int number, t_philo_attribs *attrib,
+			t_fork *forks) {
+	memset(philo, 0, sizeof(*philo));
+	philo->id = number;
+	philo->attrib = attrib;
+	philo->state = st_start;
+	philo->lfork = forks;
+	philo->rfork = forks + 1;
+	return (philo);
 }

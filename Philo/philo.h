@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 09:28:59 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/21 14:38:27 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/02/25 10:16:56 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,29 +14,40 @@
 # define PHILO_H
 
 # include <pthread.h>
+# include <sys/time.h>
+
+# ifndef TRUE
+#  define TRUE 1
+# endif
+
+# ifndef FALSE
+#  define FALSE 0
+# endif
 
 typedef struct s_fork			t_fork;
 typedef struct s_philo			t_philo;
 typedef struct s_philo_attribs	t_philo_attribs;
 typedef int						t_bool;
+typedef struct s_app			t_app;
 
 typedef enum e_philo_state {
-	philo_err = -1,
-	philo_sleeping,
-	philo_eating,
-	philo_thinking
+	st_err = -1,
+	st_start,
+	st_sleeping,
+	st_eating,
+	st_thinking
 }	t_philo_state;
 
 typedef enum e_philo_action {
-	philo_take_fork,
-	philo_drop_fork,
-	philo_start_eat,
-	philo_start_think,
-	philo_start_sleep,
-	philo_die
+	ac_take_fork,
+	ac_start_eat,
+	ac_start_think,
+	ac_start_sleep,
+	ac_die
 }	t_philo_action;
 
 struct s_philo_attribs {
+	int	count;
 	int	death_time;
 	int	min_eat;
 	int	sleep_time;
@@ -48,9 +59,13 @@ struct s_fork {
 	pthread_mutex_t	*mtx;
 };
 
+struct s_app {
+	pthread_mutex_t	*mtx;
+	suseconds_t		start;
+};
+
 struct s_philo {
 	int				id;
-	int				philo_count;
 	int				eat_count;
 	suseconds_t		last_eat;
 	t_philo_attribs	*attrib;
@@ -58,12 +73,14 @@ struct s_philo {
 	t_fork			*lfork;
 	t_fork			*rfork;
 	pthread_t		*thread;
+	t_app			*app;
 };
 
 void			_philo_init_variables(t_philo *philo,
 					int number, int philo_count, t_philo_attribs settings);
 t_bool			_philo_create_thread(t_philo *philo);
-t_philo			*philo_create(int number, int philo_count, t_philo_attribs settings);
+void			*philo_new(t_philo *philo, int number, t_philo_attribs *attrib,
+					t_fork *forks);
 void			philo_destroy(t_philo *philo);
 
 void			philo_inform(t_philo *philo, t_philo_action action);
@@ -74,9 +91,20 @@ t_bool			philo_take_right(t_philo *philo);
 t_bool			philo_take_forks(t_philo *philo);
 
 t_bool			philo_sleep(t_philo *philo);
-t_bool			philo_eat(t_philo *philo);
-t_bool			philo_think(t_philo *philo);
+void			philo_eat(t_philo *philo);
+void			philo_think(t_philo *philo);
 
+t_bool			philo_is_dead(t_philo *philo);
+t_bool			philo_should_sleep(t_philo *philo);
+
+/* internal routine */
+void*			philo_run(void *param);
+/* create thread and run */
+t_bool			philo_start(t_philo *philo);
+
+int				philo_get_timestamp(t_app *app);
+
+void			fork_new(t_fork *fork);
 t_fork			fork_create(void);
 t_bool			fork_destroy(t_fork fork);
 
