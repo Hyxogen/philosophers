@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/07 09:28:59 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/25 10:16:56 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 10:51:16 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <pthread.h>
 # include <sys/time.h>
+# include <unistd.h>
 
 # ifndef TRUE
 #  define TRUE 1
@@ -56,11 +57,11 @@ struct s_philo_attribs {
 
 struct s_fork {
 	t_philo			*user;
-	pthread_mutex_t	*mtx;
+	pthread_mutex_t	mtx;
 };
 
 struct s_app {
-	pthread_mutex_t	*mtx;
+	pthread_mutex_t	global_mtx;
 	suseconds_t		start;
 };
 
@@ -70,17 +71,17 @@ struct s_philo {
 	suseconds_t		last_eat;
 	t_philo_attribs	*attrib;
 	t_philo_state	state;
-	t_fork			*lfork;
+	t_fork			lfork;
 	t_fork			*rfork;
-	pthread_t		*thread;
+	pthread_t		thread;
 	t_app			*app;
 };
 
 void			_philo_init_variables(t_philo *philo,
 					int number, int philo_count, t_philo_attribs settings);
 t_bool			_philo_create_thread(t_philo *philo);
-void			*philo_new(t_philo *philo, int number, t_philo_attribs *attrib,
-					t_fork *forks);
+t_bool			philo_new(t_philo *philo, int number, t_philo_attribs *attrib,
+					t_philo	*right);
 void			philo_destroy(t_philo *philo);
 
 void			philo_inform(t_philo *philo, t_philo_action action);
@@ -98,14 +99,17 @@ t_bool			philo_is_dead(t_philo *philo);
 t_bool			philo_should_sleep(t_philo *philo);
 
 /* internal routine */
-void*			philo_run(void *param);
+void			*philo_run(void *param);
 /* create thread and run */
 t_bool			philo_start(t_philo *philo);
 
 int				philo_get_timestamp(t_app *app);
 
-void			fork_new(t_fork *fork);
+t_bool			fork_new(t_fork *fork);
 t_fork			fork_create(void);
-t_bool			fork_destroy(t_fork fork);
+void			fork_destroy(t_fork *fork);
+
+int				ft_usleep(useconds_t microseconds);
+int				philo_usleep(t_philo *philo, suseconds_t microseconds);
 
 #endif

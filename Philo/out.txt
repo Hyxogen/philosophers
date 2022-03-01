@@ -1,0 +1,5 @@
+134 0 is thinking
+143 1 is thinking
+179 2 is thinking
+253 3 is thinking
+286 4 is thinking

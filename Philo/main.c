@@ -6,7 +6,7 @@
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/24 10:20:39 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/02/25 10:20:29 by dmeijer       ########   odam.nl         */
+/*   Updated: 2022/03/01 11:00:10 by dmeijer       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,101 +14,97 @@
 #include "philo.h"
 #include <unistd.h>
 #include <limits.h>
+#include <stdio.h>
+#include <sys/time.h>
 
-t_bool
-	setup_forks(t_fork **out, int count)
+/* Always returns zero for norminette reasons */
+int
+	destroy_philos(t_philo *philos, size_t count)
 {
-	t_fork	*fork;
+	size_t	index;
 
-	*out = malloc(sizeof(t_fork) * count + 1);
-	if (!*out)
-		return (FALSE);
-	fork = *out;
-	while (fork < *out + count)
-	{
-		fork_new(fork);
-		fork++;
-	}
-	*fork = *(*out);
-	return (TRUE);
-}
-
-t_bool
-	setup_philos(t_philo **out, t_philo_attribs *attribs,
-		t_fork *forks, t_app *app)
-{
-	t_philo	*philo;
-
-	*out = malloc(sizeof(t_philo) * attribs->count);
-	if (!*out)
-		return (FALSE);
-	philo = *out;
-	while (philo <= *out)
-	{
-		philo_new(philo, philo - *out, attribs, forks);
-		philo->app = app;
-		forks++;
-		philo++;
-	}
-	return (TRUE);
-}
-
-t_bool
-	setup(t_philo **philos, t_philo_attribs *attribs, t_app *app)
-{
-	t_fork	*forks;
-
-	if (!setup_forks(&forks, attribs->count))
-		return (FALSE);
-	if (!setup_philos(philos, attribs, forks, app))
-	{
-		free(forks);
-		return (FALSE);
-	}
-	return (TRUE);
-}
-
-t_bool
-	start(t_philo_attribs *attribs, t_app *app)
-{
-	t_philo	*philos;
-	int		index;
-	int		count;
-
-	count = attribs->count;
-	if (!setup(&philos, attribs, app))
-		return (FALSE);
 	index = 0;
 	while (index < count)
 	{
-		philo_start(&philos[index]);
-		index += 2;
+		fork_destroy(&philos[index].lfork);
+		index++;
 	}
-	index = 1;
-	usleep(100);
+	return (0);
+}
+
+size_t
+	setup_philos(t_philo **out, t_philo_attribs *attribs, t_app *app)
+{
+	size_t	index;
+
+	*out = NULL;
+	*out = malloc(sizeof(*(*out)) * attribs->count);
+	if (!*out)
+		return (0);
+	index = 0;
+	while (index < attribs->count)
+	{
+		if (!philo_new(&(*out)[index], index, attribs,
+			&(*out)[(index + 1) % attribs->count]))
+		{
+			printf("Failed to create philo\n");
+			destroy_philos(*out, index - 1);
+			free(*out);
+			return (0);
+		}
+		(*out)[index].app = app;
+		index++;
+	}
+	return (index);
+}
+
+void
+	wait_stop(const t_philo *philos, size_t count)
+{
+	size_t	index;
+
+	index = 0;
 	while (index < count)
 	{
-		philo_start(&philos[index]);
-		index += 2;
+		pthread_join(philos[index].thread, NULL);
+		index++;
 	}
-	sleep(500);
+}
+
+t_bool
+	run(t_app *app, t_philo_attribs *attrib)
+{
+	t_philo	*philos;
+	size_t	index;
+
+	if (setup_philos(&philos, attrib, app) == 0)
+		return (FALSE);
+	index = 0;
+	while (index < attrib->count)
+	{
+		if (!philo_start(&philos[index]))
+			return (destroy_philos(philos, attrib->count));
+		index += 1;
+	}
+	wait_stop(philos, attrib->count);
 	return (TRUE);
 }
 
 int
 	main(void)
 {
-	t_philo_attribs	attrib;
+	t_philo_attribs	attribs;
 	t_app			app;
 	struct timeval	val;
 
 	gettimeofday(&val, NULL);
-	attrib.count = 5;
-	attrib.death_time = 800;
-	attrib.eat_time = 200;
-	attrib.sleep_time = 200;
-	attrib.min_eat = INT_MAX;
+	attribs.count = 5;
+	attribs.death_time = 800;
+	attribs.eat_time = 200;
+	attribs.sleep_time = 200;
+	attribs.min_eat = INT_MAX;
 	app.start = val.tv_usec;
-	start(&attrib, &app);
+	if (!run(&app, &attribs))
+		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
