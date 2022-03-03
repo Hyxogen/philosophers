@@ -48,7 +48,7 @@ typedef enum e_philo_action {
 }	t_philo_action;
 
 struct s_philo_attribs {
-	int	count;
+	size_t	count;
 	int	death_time;
 	int	min_eat;
 	int	sleep_time;

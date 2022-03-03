@@ -3,7 +3,7 @@ NAME		:= philo
 CC		:= clang
 LINK_CMD	:= clang
 
-CFLAGS		:=
+CFLAGS		:= -Wall -Wextra -pedantic
 LFLAGS		:=
 
 SRC_DIR		:= .
@@ -27,8 +27,8 @@ ifndef san
 endif
 
 ifeq ($(config), debug)
-	CFLAGS	+= -Og -g3 -fsanitize=$(san)
-	LFLAGS += -Og -fsanitize=$(san)
+	CFLAGS	+= -Og -fno-inline -g3 -fsanitize=$(san)
+	LFLAGS += -Og -fno-inline -fsanitize=$(san)
 else ifeq ($(config), release)
 	CFLAGS += -O2 -g1
 	LFLAGS += -O2

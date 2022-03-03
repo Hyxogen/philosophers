@@ -81,6 +81,7 @@ int
 void
 	philo_drop(t_philo *philo, t_fork *fork)
 {
+	(void)philo;
 	pthread_mutex_lock(&fork->mtx);
 	fork->user = NULL;
 	pthread_mutex_unlock(&fork->mtx);
@@ -146,7 +147,10 @@ void
 {
 	pthread_mutex_lock(&philo->app->global_mtx);
 	if (philo->app->should_stop)
+	{
+		pthread_mutex_unlock(&philo->app->global_mtx);
 		return ;
+	}
 	else
 		philo->app->should_stop = TRUE;
 	pthread_mutex_unlock(&philo->app->global_mtx);
@@ -181,5 +185,6 @@ t_bool
 {
 	if (pthread_create(&philo->thread, NULL, philo_run, philo) == 0)
 		return (TRUE);
+	pthread_detach(philo->thread);
 	return (FALSE);
 }

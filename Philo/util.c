@@ -18,7 +18,11 @@
 #include <unistd.h>
 
 #ifndef PHILO_SLEEP_INTER
-# define PHILO_SLEEP_INTER 1000
+# define PHILO_SLEEP_INTER 5000
+#else
+# if PHILO_SLEEP_INTER <= 0
+#  error PHILO_SLEEP_INTER must be a positive integer
+# endif
 #endif
 
 t_bool
@@ -34,11 +38,7 @@ void
 	fork_destroy(t_fork *fork)
 {
 	fork->user = NULL;
-	if (!pthread_mutex_destroy(&fork->mtx))
-	{
-		printf("Something went very wrong\n");
-		raise(SIGABRT);
-	}
+	pthread_mutex_destroy(&fork->mtx);
 }
 
 t_bool
@@ -59,7 +59,6 @@ int
 {
 	long	now;
 	long	death;
-	long	sleep;
 
 	now = philo_get_now();
 	microseconds += now;

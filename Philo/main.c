@@ -20,7 +20,7 @@
 int
 	destroy_philos(t_philo *philos, size_t count)
 {
-	size_t	index;
+	size_t index;
 
 	index = 0;
 	while (index < count)
@@ -34,7 +34,7 @@ int
 size_t
 	setup_philos(t_philo **out, t_philo_attribs *attribs, t_app *app)
 {
-	size_t	index;
+	size_t index;
 
 	*out = NULL;
 	*out = malloc(sizeof(*(*out)) * attribs->count);
@@ -46,7 +46,7 @@ size_t
 		if (!philo_new(&(*out)[index], index, attribs,
 			&(*out)[(index + 1) % attribs->count]))
 		{
-			printf("Failed to create philo\n");
+			printf("Failed to create a new philosopher\n");
 			destroy_philos(*out, index - 1);
 			free(*out);
 			return (0);
@@ -84,7 +84,10 @@ t_bool
 	while (index < attrib->count)
 	{
 		if (!philo_start(&philos[index]))
+		{
+			printf("Could not create all philosopher threads\n");
 			return (destroy_philos(philos, attrib->count));
+		}
 		index += 1;
 	}
 	wait_stop(philos, attrib->count);
@@ -97,15 +100,19 @@ int
 	t_philo_attribs	attribs;
 	t_app			app;
 
-	attribs.count = 3;
-	attribs.death_time = 650 * 1000;
+	attribs.count = 4;
+	attribs.death_time = 410 * 1000;
 	attribs.eat_time = 200 * 1000;
-	attribs.sleep_time = 150 * 1000;
+	attribs.sleep_time = 200 * 1000;
 	attribs.min_eat = INT_MAX;
 	app.start = philo_get_now();
 	app.should_stop = 0;
-	pthread_mutex_init(&app.global_mtx, NULL);
-	if (!run(&app, &attribs))
-		return (EXIT_FAILURE);
-	return (EXIT_SUCCESS);
+	if (!pthread_mutex_init(&app.global_mtx, NULL))
+	{
+		if (!run(&app, &attribs))
+			return (EXIT_FAILURE);
+		return (EXIT_SUCCESS);
+	}
+	printf("Could not initialize the global mutex\n");
+	return (EXIT_FAILURE);
 }
