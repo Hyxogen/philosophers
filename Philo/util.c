@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 #ifndef PHILO_SLEEP_INTER
-# define PHILO_SLEEP_INTER 5000
+# define PHILO_SLEEP_INTER 50
 #else
 # if PHILO_SLEEP_INTER <= 0
 #  error PHILO_SLEEP_INTER must be a positive integer
@@ -28,10 +28,13 @@
 int
 	philo_usleep(t_philo *philo, long microseconds)
 {
-	long	now;
-	long	death;
+	struct timeval	val;
+	long			now;
+	long			death;
 
-	now = philo_get_now();
+	if (gettimeofday(&val, NULL) <= -1)
+		return (0);
+	now = (val.tv_sec * 1000000) + val.tv_usec;
 	microseconds += now;
 	death = now + philo->last_eat + philo->attrib->death_time;
 	while (now >= 0 && now < microseconds && now <= death)
@@ -42,7 +45,9 @@ int
 			break ;
 		}
 		usleep(PHILO_SLEEP_INTER);
-		now = philo_get_now();
+		if (gettimeofday(&val, NULL) <= -1)
+			return (0);
+		now = (val.tv_sec * 1000000) + val.tv_usec;
 	}
 	if (now < 0)
 		return (-1);

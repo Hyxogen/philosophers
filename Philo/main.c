@@ -80,6 +80,7 @@ t_bool
 		index += 1;
 	}
 	wait_stop(philos, attrib->count);
+	free(philos);
 	return (TRUE);
 }
 
@@ -89,10 +90,10 @@ int
 	t_philo_attribs	attribs;
 	t_app			app;
 
-	attribs.count = 4;
-	attribs.death_time = 410 * 1000;
-	attribs.eat_time = 200 * 1000;
-	attribs.sleep_time = 200 * 1000;
+	attribs.count = 200;
+	attribs.death_time = 121 * 1000;
+	attribs.eat_time = 60 * 1000;
+	attribs.sleep_time = 60 * 1000;
 	attribs.min_eat = INT_MAX;
 	app.start = philo_get_now();
 	app.should_stop = 0;

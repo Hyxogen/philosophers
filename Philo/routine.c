@@ -88,6 +88,7 @@ void
 	philo_drop(philo, &philo->lfork);
 	philo_drop(philo, philo->rfork);
 	philo_sleep(philo);
+	philo_think(philo);
 }
 
 int
@@ -159,13 +160,12 @@ void
 	philo->last_eat = philo_get_now();
 	while (!philo_should_stop(philo))
 	{
-		if (philo_is_dead(philo))
-		{
-			philo_die(philo);
-			return (NULL);
-		}
-		if (!philo_try_eat(philo))
-			philo_think(philo);
+		philo_try_eat(philo);
+		//if (philo_is_dead(philo))
+		//{
+	//		philo_die(philo);
+	//		return (NULL);
+	//	}
 	}
 	return (NULL);
 }
