@@ -1,16 +1,16 @@
 NAME		:= philo
 
-CC		:= clang
+CC			:= clang
 LINK_CMD	:= clang
 
-CFLAGS		:= -Wall -Wextra -pedantic
+CFLAGS		:= -std=c89 -Wall -Wextra -pedantic
 LFLAGS		:=
 
 SRC_DIR		:= .
 OBJ_DIR		:= ./obj
 VPATH		:= $(SRC_DIR)
 
-SRC_FILES	:= main.c util.c routine.c
+SRC_FILES	:= main.c util.c routine.c setup.c
 OBJ_FILES	:= $(addprefix $(OBJ_DIR)/,$(SRC_FILES:%.c=%.o))
 
 SILENT		:= @

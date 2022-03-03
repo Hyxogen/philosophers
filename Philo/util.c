@@ -77,6 +77,17 @@ int
 }
 
 long
+	philo_get_timestamp(t_app *app)
+{
+	long	now;
+
+	now = philo_get_now();
+	if (now < 0)
+		return (-1);
+	return ((now - app->start) / 1000);
+}
+
+long
 	philo_get_now(void)
 {
 	struct timeval	val;

@@ -18,17 +18,6 @@
 
 #define PHILO_INTER 50
 
-long
-	philo_get_timestamp(t_app *app)
-{
-	long	now;
-
-	now = philo_get_now();
-	if (now < 0)
-		return (-1);
-	return ((now - app->start) / 1000);
-}
-
 t_bool
 	philo_is_dead(t_philo *philo)
 {
@@ -70,6 +59,7 @@ void
 int
 	philo_sleep(t_philo *philo)
 {
+	philo->state = st_sleeping;	
 	if (!philo_usleep(philo, philo->attrib->sleep_time))
 	{
 		philo_inform(philo, ac_die);
