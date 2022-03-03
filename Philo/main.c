@@ -1,7 +1,6 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   main.c                                             :+:    :+:            */
+/*                                                        ::::::::            */ /*   main.c                                             :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
@@ -52,6 +51,8 @@ size_t
 			free(*out);
 			return (0);
 		}
+		if (&(*out)[index].lfork == (*out)[index].rfork)
+			(*out)[index].rfork = NULL;
 		(*out)[index].app = app;
 		index++;
 	}
@@ -95,15 +96,15 @@ int
 {
 	t_philo_attribs	attribs;
 	t_app			app;
-	struct timeval	val;
 
-	gettimeofday(&val, NULL);
-	attribs.count = 5;
-	attribs.death_time = 800;
-	attribs.eat_time = 200;
-	attribs.sleep_time = 200;
+	attribs.count = 3;
+	attribs.death_time = 650 * 1000;
+	attribs.eat_time = 200 * 1000;
+	attribs.sleep_time = 150 * 1000;
 	attribs.min_eat = INT_MAX;
-	app.start = val.tv_usec;
+	app.start = philo_get_now();
+	app.should_stop = 0;
+	pthread_mutex_init(&app.global_mtx, NULL);
 	if (!run(&app, &attribs))
 		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);

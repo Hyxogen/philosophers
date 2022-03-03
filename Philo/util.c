@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 #ifndef PHILO_SLEEP_INTER
-# define PHILO_SLEEP_INTER 10
+# define PHILO_SLEEP_INTER 1000
 #endif
 
 t_bool
@@ -55,18 +55,16 @@ t_bool
 }
 
 int
-	philo_usleep(t_philo *philo, suseconds_t microseconds)
+	philo_usleep(t_philo *philo, long microseconds)
 {
-	struct timeval	val;
-	suseconds_t		now;
-	suseconds_t		death;
-	suseconds_t		sleep;
+	long	now;
+	long	death;
+	long	sleep;
 
-	gettimeofday(&val, NULL);
-	now = val.tv_usec;
+	now = philo_get_now();
 	microseconds += now;
 	death = now + philo->last_eat + philo->attrib->death_time;
-	while (now < microseconds && now <= death)
+	while (now >= 0 && now < microseconds && now <= death)
 	{
 		if (now + PHILO_SLEEP_INTER >= microseconds)
 		{
@@ -74,28 +72,26 @@ int
 			break ;
 		}
 		usleep(PHILO_SLEEP_INTER);
-		gettimeofday(&val, NULL);
-		if (val.tv_usec < 0)
-			return (0);
-		now = val.tv_usec;
+		now = philo_get_now();
 	}
+	if (now < 0)
+		return (-1);
 	if (now >= death)
 		return (0);
 	return (1);
 }
 
 int
-	ft_usleep(useconds_t microseconds)
+	ft_usleep(long microseconds)
 {
-	struct timeval	val;
-	useconds_t		now;
+	long	now;
+	struct timeval val;
 
-	gettimeofday(&val, NULL);
-	if (val.tv_usec < 0)
+	if (gettimeofday(&val, NULL) <= -1)
 		return (0);
-	now = val.tv_usec;
+	now = (val.tv_sec * 1000000) + val.tv_usec;
 	microseconds += now;
-	while (now < microseconds)
+	while (now >= 0 && now < microseconds)
 	{
 		if (now + PHILO_SLEEP_INTER >= microseconds)
 		{
@@ -103,10 +99,19 @@ int
 			break ;
 		}
 		usleep(PHILO_SLEEP_INTER);
-		gettimeofday(&val, NULL);
-		if (val.tv_usec < 0)
+		if (gettimeofday(&val, NULL) <= -1)
 			return (0);
-		now = val.tv_usec;
+		now = (val.tv_sec * 1000000) + val.tv_usec;
 	}
-	return (1);
+	return (now >= 0);
+}
+
+long
+	philo_get_now(void)
+{
+	struct timeval val;
+
+	if (gettimeofday(&val, NULL) <= -1)
+		return (-1);
+	return ((val.tv_sec * 1000000) + val.tv_usec);
 }

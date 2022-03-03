@@ -18,26 +18,38 @@
 
 #define PHILO_INTER 50
 
-int
+long
 	philo_get_timestamp(t_app *app)
 {
-	struct timeval	val;
+	long	now;
 
-	gettimeofday(&val, NULL);
-	if (val.tv_usec < 0)
-		return (0);
-	return (val.tv_usec - app->start);
+	now = philo_get_now();
+	if (now < 0)
+		return (-1);
+	return ((now - app->start) / 1000);
 }
 
 t_bool
 	philo_is_dead(t_philo *philo)
 {
-	int	now;
+	long	now;
 
-	now = philo_get_timestamp(philo->app);
+	now = philo_get_now();
 	return (now - philo->last_eat >= philo->attrib->death_time);
 }
 
+t_bool
+	philo_should_stop(t_philo *philo)
+{
+	t_bool	res;
+
+	res = FALSE;
+	pthread_mutex_lock(&philo->app->global_mtx);
+	if (philo->app->should_stop)
+		res = TRUE;
+	pthread_mutex_unlock(&philo->app->global_mtx);
+	return (res || philo->state == st_err);
+}
 void
 	philo_inform(t_philo *philo, t_philo_action action)
 {
@@ -50,7 +62,8 @@ void
 	};
 
 	pthread_mutex_lock(&philo->app->global_mtx);
-	printf(messages[action], philo_get_timestamp(philo->app), philo->id);
+	if (!philo->app->should_stop || (action == ac_die && philo->app->should_stop))
+		printf(messages[action], philo_get_timestamp(philo->app), philo->id);
 	pthread_mutex_unlock(&philo->app->global_mtx);
 }
 
@@ -78,8 +91,8 @@ void
 {
 	philo->state = st_eating;
 	philo_inform(philo, ac_start_eat);
-	ft_usleep(philo->attrib->eat_time);
-	philo->last_eat = philo_get_timestamp(philo->app);
+	philo->last_eat = philo_get_now();
+	philo_usleep(philo, philo->attrib->eat_time);
 	philo_inform(philo, ac_start_sleep);
 	philo_drop(philo, &philo->lfork);
 	philo_drop(philo, philo->rfork);
@@ -92,6 +105,8 @@ int
 	int	success;
 
 	success = 0;
+	if (fork == NULL)
+		return (0);
 	pthread_mutex_lock(&fork->mtx);
 	if (fork->user == NULL)
 	{
@@ -126,10 +141,16 @@ void
 	philo->state = st_thinking;
 }
 
-t_bool
-	philo_should_stop(t_philo *philo)
+void
+	philo_die(t_philo *philo)
 {
-	return (philo->state == st_err);
+	pthread_mutex_lock(&philo->app->global_mtx);
+	if (philo->app->should_stop)
+		return ;
+	else
+		philo->app->should_stop = TRUE;
+	pthread_mutex_unlock(&philo->app->global_mtx);
+	philo_inform(philo, ac_die);
 }
 
 void
@@ -140,12 +161,13 @@ void
 	philo = param;
 	philo_think(philo);
 	if (philo->id & 1)
-		philo_usleep(philo, 5);
-	while (philo->state != st_err)
+		philo_usleep(philo, 500);
+	philo->last_eat = philo_get_now();
+	while (!philo_should_stop(philo))
 	{
 		if (philo_is_dead(philo))
 		{
-			philo_inform(philo, ac_die);
+			philo_die(philo);
 			return (NULL);
 		}
 		if (!philo_try_eat(philo))

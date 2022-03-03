@@ -62,13 +62,14 @@ struct s_fork {
 
 struct s_app {
 	pthread_mutex_t	global_mtx;
-	suseconds_t		start;
+	long		start;
+	t_bool		should_stop;
 };
 
 struct s_philo {
 	int				id;
 	int				eat_count;
-	suseconds_t		last_eat;
+	long			last_eat;
 	t_philo_attribs	*attrib;
 	t_philo_state	state;
 	t_fork			lfork;
@@ -103,13 +104,14 @@ void			*philo_run(void *param);
 /* create thread and run */
 t_bool			philo_start(t_philo *philo);
 
-int				philo_get_timestamp(t_app *app);
+long			philo_get_timestamp(t_app *app);
+long			philo_get_now(void);
 
 t_bool			fork_new(t_fork *fork);
 t_fork			fork_create(void);
 void			fork_destroy(t_fork *fork);
 
-int				ft_usleep(useconds_t microseconds);
-int				philo_usleep(t_philo *philo, suseconds_t microseconds);
+int				ft_usleep(long microseconds);
+int				philo_usleep(t_philo *philo, long microseconds);
 
 #endif
