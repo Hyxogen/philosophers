@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        ::::::::            */ /*   main.c                                             :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2022/02/24 10:20:39 by dmeijer       #+#    #+#                 */
-/*   Updated: 2022/03/01 11:00:10 by dmeijer       ########   odam.nl         */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <stdlib.h>
 #include "philo.h"
 #include <unistd.h>
@@ -20,7 +9,7 @@
 int
 	destroy_philos(t_philo *philos, size_t count)
 {
-	size_t index;
+	size_t	index;
 
 	index = 0;
 	while (index < count)
@@ -34,7 +23,7 @@ int
 size_t
 	setup_philos(t_philo **out, t_philo_attribs *attribs, t_app *app)
 {
-	size_t index;
+	size_t	index;
 
 	*out = NULL;
 	*out = malloc(sizeof(*(*out)) * attribs->count);
