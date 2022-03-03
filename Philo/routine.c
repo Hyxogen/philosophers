@@ -156,16 +156,16 @@ void
 	philo = param;
 	philo_think(philo);
 	if (philo->id & 1)
-		philo_usleep(philo, 500);
+		ft_usleep(500);
 	philo->last_eat = philo_get_now();
 	while (!philo_should_stop(philo))
 	{
 		philo_try_eat(philo);
-		//if (philo_is_dead(philo))
-		//{
-	//		philo_die(philo);
-	//		return (NULL);
-	//	}
+		if (philo_is_dead(philo))
+		{
+			philo_die(philo);
+			return (NULL);
+		}
 	}
 	return (NULL);
 }
