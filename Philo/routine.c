@@ -47,7 +47,8 @@ void
 		"%d %d is eating\n",
 		"%d %d is thinking\n",
 		"%d %d is sleeping\n",
-		"%d %d died\n"
+		"%d %d died\n",
+		"%d %d has dropped a fork\n"
 	};
 
 	pthread_mutex_lock(&philo->app->global_mtx);
@@ -102,14 +103,17 @@ int
 	pthread_mutex_lock(&fork->mtx);
 	if (fork->user == NULL)
 	{
+		philo_inform(philo, ac_take_fork);	
 		fork->user = philo;
 		success = 1;
 	}
 	else if (fork->user == philo)
 		success = 2;
 	pthread_mutex_unlock(&fork->mtx);
-	if (success == 1)
-		philo_inform(philo, ac_take_fork);
+	if (!success)
+			usleep(100);
+//	if (success == 1)
+//		philo_inform(philo, ac_take_fork);
 	return (success);
 }
 
@@ -118,7 +122,18 @@ int
 {
 	if (philo_try(philo, &philo->lfork) && philo_try(philo, philo->rfork))
 	{
-		philo_eat(philo);
+		
+		philo->state = st_eating;
+		philo_inform(philo, ac_start_eat);
+		philo->last_eat = philo_get_now();
+		philo_usleep(philo, philo->attrib->eat_time);
+		philo_inform(philo, ac_start_sleep);
+		philo_drop(philo, &philo->lfork);
+		philo_drop(philo, philo->rfork);
+		philo_sleep(philo);
+		philo_think(philo);
+
+	//	philo_eat(philo);
 		return (1);
 	}
 	return (0);
@@ -156,16 +171,16 @@ void
 	philo = param;
 	philo_think(philo);
 	if (philo->id & 1)
-		philo_usleep(philo, 500);
+		ft_usleep(500);
 	philo->last_eat = philo_get_now();
 	while (!philo_should_stop(philo))
 	{
 		philo_try_eat(philo);
-		//if (philo_is_dead(philo))
-		//{
-	//		philo_die(philo);
-	//		return (NULL);
-	//	}
+		if (philo_is_dead(philo))
+		{
+			philo_die(philo);
+			return (NULL);
+		}
 	}
 	return (NULL);
 }

@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 #ifndef PHILO_SLEEP_INTER
-# define PHILO_SLEEP_INTER 50
+# define PHILO_SLEEP_INTER 1000
 #else
 # if PHILO_SLEEP_INTER <= 0
 #  error PHILO_SLEEP_INTER must be a positive integer
