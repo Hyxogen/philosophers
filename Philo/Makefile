@@ -26,9 +26,12 @@ ifndef san
 	san	:= address
 endif
 
-ifeq ($(config), debug)
+ifeq ($(config), sandebug)
 	CFLAGS	+= -Og -fno-inline -g3 -fsanitize=$(san)
 	LFLAGS += -Og -fno-inline -fsanitize=$(san)
+else ifeq ($(config), debug)
+	CFLAGS += -O1 -fno-inline -g3
+	LFLAGS += -O1 -fno-inline -g3
 else ifeq ($(config), release)
 	CFLAGS += -O2 -g1
 	LFLAGS += -O2

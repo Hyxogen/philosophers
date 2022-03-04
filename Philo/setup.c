@@ -1,4 +1,5 @@
 #include "philo.h"
+#include <stdio.h>
 #include <string.h>
 
 t_bool
@@ -20,6 +21,7 @@ void
 t_bool
 	philo_new(t_philo *philo, int number, t_philo_attribs *attrib,
 			t_philo	*right) {
+//	dprintf(2, "%ld new philo!\n", philo_get_now());	
 	memset(philo, 0, sizeof(*philo));
 	philo->id = number;
 	philo->attrib = attrib;

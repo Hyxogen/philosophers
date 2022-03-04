@@ -93,7 +93,7 @@ int
 	t_philo_attribs	attribs;
 	t_app			app;
 
-	attribs.count = 100;
+	attribs.count = 50;
 	attribs.death_time = 180 * 1000;
 	attribs.eat_time = 60 * 1000;
 	attribs.sleep_time = 60 * 1000;
