@@ -40,8 +40,8 @@ size_t
 			free(*out);
 			return (0);
 		}
-		if (&(*out)[index].lfork == (*out)[index].rfork)
-			(*out)[index].rfork = NULL;
+//		if (&(*out)[index].lfork == (*out)[index].rfork)
+//			(*out)[index].rfork = NULL;
 		(*out)[index].app = app;
 		index++;
 	}
@@ -91,10 +91,10 @@ int
 	t_philo_attribs	attribs;
 	t_app			app;
 
-	attribs.count = 50;
-	attribs.death_time = 800 * 1000;
-	attribs.eat_time = 200 * 1000;
-	attribs.sleep_time = 200 * 1000;
+	attribs.count = 200;
+	attribs.death_time = 3000 * 1000;
+	attribs.eat_time = 60 * 1000;
+	attribs.sleep_time = 60 * 1000;
 	attribs.min_eat = INT_MAX;
 	app.should_stop = 0;
 	if (!pthread_mutex_init(&app.global_mtx, NULL))

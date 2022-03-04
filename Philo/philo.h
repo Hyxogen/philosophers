@@ -44,7 +44,8 @@ typedef enum e_philo_action {
 	ac_start_eat,
 	ac_start_think,
 	ac_start_sleep,
-	ac_die
+	ac_die,
+	ac_drop_fork
 }	t_philo_action;
 
 struct s_philo_attribs {
@@ -74,6 +75,7 @@ struct s_philo {
 	t_philo_state	state;
 	t_fork			lfork;
 	t_fork			*rfork;
+	int				forks;
 	pthread_t		thread;
 	t_app			*app;
 };
