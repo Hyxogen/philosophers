@@ -184,6 +184,6 @@ t_bool
 {
 	if (pthread_create(&philo->thread, NULL, philo_run, philo) == 0)
 		return (TRUE);
-	pthread_detach(philo->thread);
+//	pthread_detach(philo->thread);
 	return (FALSE);
 }
