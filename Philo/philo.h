@@ -27,28 +27,18 @@
 
 typedef struct s_fork			t_fork;
 typedef struct s_philo			t_philo;
-typedef struct s_philo_attribs	t_philo_attribs;
-typedef int						t_bool;
+typedef struct s_philo_attribs	t_philo_attr;
 typedef struct s_app			t_app;
 
-typedef enum e_philo_state {
-	st_err = -1,
-	st_start,
-	st_sleeping,
-	st_eating,
-	st_thinking
-}	t_philo_state;
-
-typedef enum e_philo_action {
+typedef enum e_action {
 	ac_take_fork,
 	ac_start_eat,
 	ac_start_think,
 	ac_start_sleep,
 	ac_die,
-	ac_drop_fork
-}	t_philo_action;
+}	t_action;
 
-struct s_philo_attribs {
+struct s_philo_attr {
 	size_t	count;
 	int	death_time;
 	int	min_eat;
@@ -63,57 +53,37 @@ struct s_fork {
 
 struct s_app {
 	pthread_mutex_t	global_mtx;
-	long		start;
-	t_bool		should_stop;
+	long			start;
+	int				should_stop;
 };
 
 struct s_philo {
 	int				id;
 	int				eat_count;
 	long			last_eat;
-	t_philo_attribs	*attrib;
-	t_philo_state	state;
+	t_philo_attr	*attr;
 	t_fork			lfork;
 	t_fork			*rfork;
-	int				forks;
 	pthread_t		thread;
 	t_app			*app;
 };
 
-void			_philo_init_variables(t_philo *philo,
-					int number, int philo_count, t_philo_attribs settings);
-t_bool			_philo_create_thread(t_philo *philo);
-t_bool			philo_new(t_philo *philo, int number, t_philo_attribs *attrib,
-					t_philo	*right);
-void			philo_destroy(t_philo *philo);
+int		ph_fork_new(t_fork *fork);
+int		ph_philo_new(t_philo *philo, int id, t_philo_attr *attr, t_philo *right);
+int		ph_app_new(t_app *app);
 
-void			philo_inform(t_philo *philo, t_philo_action action);
-t_philo_state	philo_get_astate(int id, int philo_count, int cycle);
+int		ph_fork_destroy(t_fork *fork);
 
-t_bool			philo_take_left(t_philo *philo);
-t_bool			philo_take_right(t_philo *philo);
-t_bool			philo_take_forks(t_philo *philo);
+long	ph_get_now(void);
+long	ph_get_timestamp(t_app *app);
 
-t_bool			philo_sleep(t_philo *philo);
-void			philo_eat(t_philo *philo);
-void			philo_think(t_philo *philo);
+int		ph_sleep(long microseconds);
 
-t_bool			philo_is_dead(t_philo *philo);
-t_bool			philo_should_sleep(t_philo *philo);
+void	*ph_philo_run(void *param);
 
-/* internal routine */
-void			*philo_run(void *param);
-/* create thread and run */
-t_bool			philo_start(t_philo *philo);
+void	ph_inform(t_philo *philo, t_action action);
 
-long			philo_get_timestamp(t_app *app);
-long			philo_get_now(void);
-
-t_bool			fork_new(t_fork *fork);
-t_fork			fork_create(void);
-void			fork_destroy(t_fork *fork);
-
-int				ft_usleep(long microseconds);
-int				philo_usleep(t_philo *philo, long microseconds);
-
+int		ph_philo_wait(t_philo *philo);
+int		ph_philo_eat(t_philo *philo);
+int		ph_philo_sleep(t_philo *philo);
 #endif
