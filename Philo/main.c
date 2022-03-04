@@ -70,7 +70,8 @@ t_bool
 	if (setup_philos(&philos, attrib, app) == 0)
 		return (FALSE);
 	index = 0;
-	app->start = philo_get_now();
+	app->start = 0;
+	pthread_mutex_lock(&app->global_mtx);
 	while (index < attrib->count)
 	{
 		if (!philo_start(&philos[index]))
@@ -80,6 +81,7 @@ t_bool
 		}
 		index += 1;
 	}
+	pthread_mutex_unlock(&app->global_mtx);
 	wait_stop(philos, attrib->count);
 	free(philos);
 	return (TRUE);
@@ -91,10 +93,10 @@ int
 	t_philo_attribs	attribs;
 	t_app			app;
 
-	attribs.count = 50;
-	attribs.death_time = 800 * 1000;
-	attribs.eat_time = 200 * 1000;
-	attribs.sleep_time = 200 * 1000;
+	attribs.count = 100;
+	attribs.death_time = 180 * 1000;
+	attribs.eat_time = 60 * 1000;
+	attribs.sleep_time = 60 * 1000;
 	attribs.min_eat = INT_MAX;
 	app.should_stop = 0;
 	if (!pthread_mutex_init(&app.global_mtx, NULL))

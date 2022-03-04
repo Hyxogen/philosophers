@@ -113,5 +113,5 @@ void			fork_destroy(t_fork *fork);
 
 int				ft_usleep(long microseconds);
 int				philo_usleep(t_philo *philo, long microseconds);
-
+int				philo_hsleep(t_philo *philo, long time);
 #endif

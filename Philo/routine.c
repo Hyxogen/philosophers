@@ -1,8 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   routine.c                                          :+:    :+:            */
-/*                                                     +:+                    */
+/*   routine.c                                          :+:    :+:            */ /*                                                     +:+                    */
 /*   By: dmeijer <dmeijer@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/02/21 14:27:20 by dmeijer       #+#    #+#                 */
@@ -24,7 +23,7 @@ t_bool
 	long	now;
 
 	now = philo_get_now();
-	return (now - philo->last_eat >= philo->attrib->death_time);
+	return (((now - philo->last_eat) / 1000) > (philo->attrib->death_time / 1000));
 }
 
 t_bool
@@ -39,6 +38,22 @@ t_bool
 	pthread_mutex_unlock(&philo->app->global_mtx);
 	return (res || philo->state == st_err);
 }
+
+void
+	philo_die(t_philo *philo)
+{
+	pthread_mutex_lock(&philo->app->global_mtx);
+	if (philo->app->should_stop)
+	{
+		pthread_mutex_unlock(&philo->app->global_mtx);
+		return ;
+	}
+	else
+		philo->app->should_stop = TRUE;
+	pthread_mutex_unlock(&philo->app->global_mtx);
+	philo_inform(philo, ac_die);
+}
+
 void
 	philo_inform(t_philo *philo, t_philo_action action)
 {
@@ -87,7 +102,11 @@ void
 	philo_inform(philo, ac_start_sleep);
 	philo_drop(philo, &philo->lfork);
 	philo_drop(philo, philo->rfork);
-	philo_sleep(philo);
+	if (!philo_usleep(philo, philo->attrib->sleep_time))
+	{
+			philo_die(philo);
+			return ;
+	}
 	philo_think(philo);
 }
 
@@ -134,29 +153,18 @@ void
 }
 
 void
-	philo_die(t_philo *philo)
-{
-	pthread_mutex_lock(&philo->app->global_mtx);
-	if (philo->app->should_stop)
-	{
-		pthread_mutex_unlock(&philo->app->global_mtx);
-		return ;
-	}
-	else
-		philo->app->should_stop = TRUE;
-	pthread_mutex_unlock(&philo->app->global_mtx);
-	philo_inform(philo, ac_die);
-}
-
-void
 	*philo_run(void *param)
 {
 	t_philo	*philo;
 
 	philo = param;
+	pthread_mutex_lock(&philo->app->global_mtx);
+	if (philo->app->start == 0)
+			philo->app->start = philo_get_now();
+	pthread_mutex_unlock(&philo->app->global_mtx);
 	philo_think(philo);
 	if (philo->id & 1)
-		ft_usleep(500);
+		philo_usleep(philo, 500);
 	philo->last_eat = philo_get_now();
 	while (!philo_should_stop(philo))
 	{
@@ -166,6 +174,7 @@ void
 			philo_die(philo);
 			return (NULL);
 		}
+		ft_usleep(10000);
 	}
 	return (NULL);
 }
