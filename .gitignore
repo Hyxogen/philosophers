@@ -1,1 +1,5 @@
 .notes
+*.swp
+*.out
+*.o
+*.txt
