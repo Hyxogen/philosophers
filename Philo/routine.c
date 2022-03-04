@@ -11,38 +11,12 @@
 /* ************************************************************************** */
 
 #include "philo.h"
-
-#include <sys/time.h>
 #include <stdio.h>
-#include <unistd.h>
 
-#define PHILO_INTER 50
-
-t_bool
-	philo_is_dead(t_philo *philo)
-{
-	long	now;
-
-	now = philo_get_now();
-	return (now - philo->last_eat >= philo->attrib->death_time);
-}
-
-t_bool
-	philo_should_stop(t_philo *philo)
-{
-	t_bool	res;
-
-	res = FALSE;
-	pthread_mutex_lock(&philo->app->global_mtx);
-	if (philo->app->should_stop)
-		res = TRUE;
-	pthread_mutex_unlock(&philo->app->global_mtx);
-	return (res || philo->state == st_err);
-}
 void
-	philo_inform(t_philo *philo, t_philo_action action)
+	ph_inform(t_philo *philo, t_action action)
 {
-	static char	*messages[] = {
+	static const char	*messages[] = {
 		"%d %d has taken a fork\n",
 		"%d %d is eating\n",
 		"%d %d is thinking\n",
@@ -52,144 +26,62 @@ void
 	};
 
 	pthread_mutex_lock(&philo->app->global_mtx);
-	if (!philo->app->should_stop || (action == ac_die && philo->app->should_stop))
-		printf(messages[action], philo_get_timestamp(philo->app), philo->id);
+	if ((philo->app->state >= 0 && philo->app->state < philo->app->attr->count) || (action == ac_die && philo->app->state < 0))
+		printf(messages[action], ph_get_timestamp(philo->app), philo->id);
 	pthread_mutex_unlock(&philo->app->global_mtx);
 }
-
+	
 int
-	philo_sleep(t_philo *philo)
+	ph_stop(t_app *app)
 {
-	philo->state = st_sleeping;	
-	if (!philo_usleep(philo, philo->attrib->sleep_time))
-	{
-		philo_inform(philo, ac_die);
-		return (0);
-	}
-	return (1);
-}
+	int	result;
 
-void
-	philo_drop(t_philo *philo, t_fork *fork)
-{
-	(void)philo;
-	pthread_mutex_lock(&fork->mtx);
-	fork->user = NULL;
-	pthread_mutex_unlock(&fork->mtx);
-}
-
-void
-	philo_eat(t_philo *philo)
-{
-	philo->state = st_eating;
-	philo_inform(philo, ac_start_eat);
-	philo->last_eat = philo_get_now();
-	philo_usleep(philo, philo->attrib->eat_time);
-	philo_inform(philo, ac_start_sleep);
-	philo_drop(philo, &philo->lfork);
-	philo_drop(philo, philo->rfork);
-	philo_sleep(philo);
-	philo_think(philo);
-}
-
-int
-	philo_try(t_philo *philo, t_fork *fork)
-{
-	int	success;
-
-	success = 0;
-	if (fork == NULL)
-		return (0);
-	pthread_mutex_lock(&fork->mtx);
-	if (fork->user == NULL)
-	{
-		philo_inform(philo, ac_take_fork);	
-		fork->user = philo;
-		success = 1;
-	}
-	else if (fork->user == philo)
-		success = 2;
-	pthread_mutex_unlock(&fork->mtx);
-	if (!success)
-			usleep(100);
-//	if (success == 1)
-//		philo_inform(philo, ac_take_fork);
-	return (success);
-}
-
-int
-	philo_try_eat(t_philo *philo)
-{
-	if (philo_try(philo, &philo->lfork) && philo_try(philo, philo->rfork))
-	{
-		
-		philo->state = st_eating;
-		philo_inform(philo, ac_start_eat);
-		philo->last_eat = philo_get_now();
-		philo_usleep(philo, philo->attrib->eat_time);
-		philo_inform(philo, ac_start_sleep);
-		philo_drop(philo, &philo->lfork);
-		philo_drop(philo, philo->rfork);
-		philo_sleep(philo);
-		philo_think(philo);
-
-	//	philo_eat(philo);
-		return (1);
-	}
-	return (0);
-}
-
-void
-	philo_think(t_philo *philo)
-{
-	if (philo->state == st_thinking)
-		return ;
-	philo_inform(philo, ac_start_think);
-	philo->state = st_thinking;
-}
-
-void
-	philo_die(t_philo *philo)
-{
-	pthread_mutex_lock(&philo->app->global_mtx);
-	if (philo->app->should_stop)
-	{
-		pthread_mutex_unlock(&philo->app->global_mtx);
-		return ;
-	}
+	result = 0;
+	pthread_mutex_lock(&app->global_mtx);
+	if (app->state < 0 || app->state == app->attr->count)
+		result = 1;
 	else
-		philo->app->should_stop = TRUE;
-	pthread_mutex_unlock(&philo->app->global_mtx);
-	philo_inform(philo, ac_die);
+		result = -1;
+	pthread_mutex_unlock(&app->global_mtx);
+	return (result);
+}
+
+int
+	ph_should_stop(t_app *app)
+{
+	int	should_stop;
+
+	pthread_mutex_lock(&app->global_mtx);
+	should_stop = (app->state < 0 || app->state == app->attr->count);
+	pthread_mutex_unlock(&app->global_mtx);
+	return (should_stop);
 }
 
 void
-	*philo_run(void *param)
+	*ph_philo_run(void *param)
 {
-	t_philo	*philo;
+		t_philo	*philo;
+		t_app	*app;
+		int		state;
 
-	philo = param;
-	philo_think(philo);
-	if (philo->id & 1)
-		ft_usleep(500);
-	philo->last_eat = philo_get_now();
-	while (!philo_should_stop(philo))
-	{
-		philo_try_eat(philo);
-		if (philo_is_dead(philo))
+		philo = param;
+		if (philo->id & 1)
+				ph_sleep(500);
+		app = philo->app;
+		while (!ph_should_stop(app))
 		{
-			philo_die(philo);
-			return (NULL);
+			state = ph_philo_wait(philo);
+			if (!state)
+				state = ph_philo_eat(philo);
+			if (!state)
+				state = ph_philo_sleep(philo);
+			if (state < 0)
+				return (NULL);
+			if (state == 1 && !(ph_stop(app)))
+			{
+				ph_inform(philo, ac_die);
+				return (NULL);
+			}
 		}
-	}
-	return (NULL);
-}
-
-t_bool
-	philo_start(t_philo *philo)
-{
-	if (pthread_create(&philo->thread, NULL, philo_run, philo) == 0)
-		return (TRUE);
-	pthread_detach(philo->thread);
-	return (FALSE);
+		return (NULL);
 }

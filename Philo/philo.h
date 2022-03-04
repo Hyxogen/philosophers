@@ -27,7 +27,7 @@
 
 typedef struct s_fork			t_fork;
 typedef struct s_philo			t_philo;
-typedef struct s_philo_attribs	t_philo_attr;
+typedef struct s_philo_attr		t_philo_attr;
 typedef struct s_app			t_app;
 
 typedef enum e_action {
@@ -52,9 +52,10 @@ struct s_fork {
 };
 
 struct s_app {
-	pthread_mutex_t	global_mtx;
+	int				state;
 	long			start;
-	int				should_stop;
+	t_philo_attr	*attr;
+	pthread_mutex_t	global_mtx;
 };
 
 struct s_philo {
@@ -76,6 +77,7 @@ int		ph_fork_destroy(t_fork *fork);
 
 long	ph_get_now(void);
 long	ph_get_timestamp(t_app *app);
+int		ph_should_stop(t_app *app);
 
 int		ph_sleep(long microseconds);
 
@@ -83,7 +85,13 @@ void	*ph_philo_run(void *param);
 
 void	ph_inform(t_philo *philo, t_action action);
 
+int		ph_philo_is_dead(t_philo *philo);
+
+void	ph_philo_drop(t_philo *philo, t_fork *fork);
+int		ph_philo_take(t_philo *philo, t_fork *fork);
 int		ph_philo_wait(t_philo *philo);
 int		ph_philo_eat(t_philo *philo);
 int		ph_philo_sleep(t_philo *philo);
+
+int		ph_philo_usleep(t_philo *philo, long microseconds);
 #endif

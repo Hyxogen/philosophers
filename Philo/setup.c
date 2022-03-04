@@ -1,31 +1,32 @@
 #include "philo.h"
 #include <string.h>
 
-t_bool
-	fork_new(t_fork *fork)
+int
+	ph_fork_new(t_fork *fork)
 {
-	fork->user = NULL;
-	if (pthread_mutex_init(&fork->mtx, NULL))
-		return (FALSE);
-	return (TRUE);
+		if (pthread_mutex_init(&fork->mtx, NULL))
+				return (-1);
+		fork->user = NULL;
+		return (0);
 }
 
-void
-	fork_destroy(t_fork *fork)
+int		ph_philo_new(t_philo *philo, int id, t_philo_attr *attr, t_philo *right)
 {
-	fork->user = NULL;
-	pthread_mutex_destroy(&fork->mtx);
+		memset(philo, 0, sizeof(*philo));
+		philo->id = id;
+		philo->attr = attr;
+		if (right)
+				philo->rfork = &right->lfork;
+		return (0);
 }
 
-t_bool
-	philo_new(t_philo *philo, int number, t_philo_attribs *attrib,
-			t_philo	*right) {
-	memset(philo, 0, sizeof(*philo));
-	philo->id = number;
-	philo->attrib = attrib;
-	philo->state = st_start;
-	philo->rfork = &right->lfork;
-	if (!fork_new(&philo->lfork))
-		return (FALSE);
-	return (TRUE);
+int
+	ph_app_new(t_app *app)
+{
+		if (pthread_mutex_init(&app->global_mtx, NULL))
+				return (-1);
+		app->should_stop = 0;
+		app->start = 0;
+		return (0);
 }
+
