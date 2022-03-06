@@ -40,8 +40,6 @@ int
 	pthread_mutex_lock(&app->global_mtx);
 	if (app->state < 0 || app->state == app->attr->count)
 		result = 1;
-	else
-		result = -1;
 	pthread_mutex_unlock(&app->global_mtx);
 	return (result);
 }
@@ -84,4 +82,12 @@ void
 			}
 		}
 		return (NULL);
+}
+
+int
+	ph_philo_start(t_philo *philo)
+{
+	if (pthread_create(&philo->thread, NULL, ph_philo_run, philo))
+		return (-1);
+	return (0);
 }

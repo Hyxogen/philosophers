@@ -87,6 +87,7 @@ void	ph_inform(t_philo *philo, t_action action);
 
 int		ph_philo_is_dead(t_philo *philo);
 
+int		ph_philo_start(t_philo *philo);
 void	ph_philo_drop(t_philo *philo, t_fork *fork);
 int		ph_philo_take(t_philo *philo, t_fork *fork);
 int		ph_philo_wait(t_philo *philo);

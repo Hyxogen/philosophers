@@ -25,7 +25,7 @@ int
 {
 		if (pthread_mutex_init(&app->global_mtx, NULL))
 				return (-1);
-		app->should_stop = 0;
+		app->state = 0;
 		app->start = 0;
 		return (0);
 }

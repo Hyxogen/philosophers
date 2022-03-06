@@ -59,7 +59,7 @@ int
 	if (ph_philo_usleep(philo, philo->attr->eat_time))
 		return (1);
 	philo->eat_count += 1;
-	if (philo->eat_count == philo->attr->min_eat)
+	if (philo->attr->min_eat >= 0 && philo->eat_count == philo->attr->min_eat)
 	{
 		pthread_mutex_lock(&philo->app->global_mtx);
 		philo->app->state += 1;
