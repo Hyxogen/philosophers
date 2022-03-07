@@ -7,13 +7,16 @@ int
 	int	success;
 
 	success = 1;
-	success *= ft_checked_atoi(&attr->count, vals[0]);
-	success *= ft_checked_atoi(&attr->death_time, vals[1]);
-	success *= ft_checked_atoi(&attr->eat_time, vals[2]);
-	success *= ft_checked_atoi(&attr->sleep_time, vals[3]);
+	success *= ft_atoiu((unsigned int *) &attr->count, vals[0]);
+	success *= ft_atoiu((unsigned int *) &attr->death_time, vals[1]);
+	success *= ft_atoiu((unsigned int *) &attr->eat_time, vals[2]);
+	success *= ft_atoiu((unsigned int *) &attr->sleep_time, vals[3]);
 	attr->min_eat = -1;
 	if (optc == 5)
-		success *= ft_checked_atoi(&attr->min_eat, vals[4]);
+		success *= ft_atoiu((unsigned int *) &attr->min_eat, vals[4]);
+	attr->death_time *= 1000;
+	attr->eat_time *= 1000;
+	attr->sleep_time *= 1000;
 	return (success);
 }
 
@@ -46,7 +49,7 @@ int
 		if (ph_philo_new(&(*out)[index], index, attribs,
 			&(*out)[(index + 1) % attribs->count]) == -1)
 		{
-			destroy_philos(*out, index - 1);
+			ph_destroy_philos(*out, index - 1);
 			free(*out);
 			return (-1);
 		}
@@ -83,7 +86,7 @@ int
 	app->start = ph_get_now();
 	while (index < attrib->count)
 	{
-		if (!ph_philo_start(&philos[index]))
+		if (ph_philo_start(&philos[index]))
 		{
 			ph_destroy_philos(philos, attrib->count);
 			return (-1);
@@ -91,6 +94,7 @@ int
 		index += 1;
 	}
 	ph_wait_stop(philos, attrib->count);
+	ph_destroy_philos(philos, attrib->count);
 	free(philos);
 	return (0);
 }
@@ -102,11 +106,18 @@ int
 	t_app			app;
 
 	if (argc != 5 && argc != 6)
+	{
+		printf("Usage: ./philo count time_to_die time_to_eat time_to_sleep [min_eat]\n");
 		return (EXIT_FAILURE);
-	if (!ph_attr_setup(&attr, argc - 1, argv + 1) || !ph_app_new(&app))
+	}
+	if (ph_attr_setup(&attr, argc - 1, argv + 1) || ph_app_new(&app, &attr))
+	{
+		printf("An error ocurred while setting up the philosophers\n");
 		return (EXIT_FAILURE);
+	}
 	if (attr.min_eat == 0)
 		return (EXIT_SUCCESS);
-	ph_run(&app, &attr);
+	if (ph_run(&app, &attr))
+		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }

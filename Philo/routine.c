@@ -26,7 +26,7 @@ void
 	};
 
 	pthread_mutex_lock(&philo->app->global_mtx);
-	if ((philo->app->state >= 0 && philo->app->state < philo->app->attr->count) || (action == ac_die && philo->app->state < 0))
+	if ((philo->app->state >= 0 && (size_t) philo->app->state < philo->app->attr->count) || (action == ac_die && philo->app->state < 0))
 		printf(messages[action], ph_get_timestamp(philo->app), philo->id);
 	pthread_mutex_unlock(&philo->app->global_mtx);
 }
@@ -38,8 +38,9 @@ int
 
 	result = 0;
 	pthread_mutex_lock(&app->global_mtx);
-	if (app->state < 0 || app->state == app->attr->count)
+	if (app->state < 0 || (size_t) app->state == app->attr->count)
 		result = 1;
+	app->state = -1;
 	pthread_mutex_unlock(&app->global_mtx);
 	return (result);
 }
@@ -50,7 +51,7 @@ int
 	int	should_stop;
 
 	pthread_mutex_lock(&app->global_mtx);
-	should_stop = (app->state < 0 || app->state == app->attr->count);
+	should_stop = (app->state < 0 || (size_t) app->state == app->attr->count);
 	pthread_mutex_unlock(&app->global_mtx);
 	return (should_stop);
 }
@@ -64,8 +65,9 @@ void
 
 		philo = param;
 		if (philo->id & 1)
-				ph_sleep(500);
+				usleep(500);
 		app = philo->app;
+		philo->last_eat = ph_get_now();
 		while (!ph_should_stop(app))
 		{
 			state = ph_philo_wait(philo);

@@ -14,7 +14,6 @@
 # define PHILO_H
 
 # include <pthread.h>
-# include <sys/time.h>
 # include <unistd.h>
 
 # ifndef TRUE
@@ -35,15 +34,15 @@ typedef enum e_action {
 	ac_start_eat,
 	ac_start_think,
 	ac_start_sleep,
-	ac_die,
+	ac_die
 }	t_action;
 
 struct s_philo_attr {
-	size_t	count;
-	int	death_time;
-	int	min_eat;
-	int	sleep_time;
-	int	eat_time;
+	size_t			count;
+	int				min_eat;
+	long			death_time;
+	long			sleep_time;
+	long			eat_time;
 };
 
 struct s_fork {
@@ -59,25 +58,26 @@ struct s_app {
 };
 
 struct s_philo {
-	int				id;
-	int				eat_count;
-	long			last_eat;
-	t_philo_attr	*attr;
-	t_fork			lfork;
-	t_fork			*rfork;
-	pthread_t		thread;
-	t_app			*app;
+	int							id;
+	long						last_eat;
+	unsigned int				eat_count;
+	t_philo_attr				*attr;
+	t_fork						lfork;
+	t_fork						*rfork;
+	pthread_t					thread;
+	t_app						*app;
 };
 
 int		ph_fork_new(t_fork *fork);
 int		ph_philo_new(t_philo *philo, int id, t_philo_attr *attr, t_philo *right);
-int		ph_app_new(t_app *app);
+int		ph_app_new(t_app *app, t_philo_attr *attr);
 
 int		ph_fork_destroy(t_fork *fork);
 
 long	ph_get_now(void);
 long	ph_get_timestamp(t_app *app);
 int		ph_should_stop(t_app *app);
+int		ft_atoiu(unsigned int *out, const char *str);
 
 int		ph_sleep(long microseconds);
 

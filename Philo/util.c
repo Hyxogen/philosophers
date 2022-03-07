@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "philo.h"
+#include <sys/time.h>
 
 #ifndef PH_SLEEP_INTER
 # define PH_SLEEP_INTER 1000

@@ -24,6 +24,8 @@ int
 		success = 1;
 	}
 	pthread_mutex_unlock(&fork->mtx);
+	if (success)
+		ph_inform(philo, ac_take_fork);
 	return (success);
 }
 
@@ -33,6 +35,7 @@ int
 	int	forks;
 
 	forks = 0;
+	ph_inform(philo, ac_start_think);
 	while (forks < 2) {
 		if (ph_philo_is_dead(philo))
 			return (1);
@@ -59,7 +62,7 @@ int
 	if (ph_philo_usleep(philo, philo->attr->eat_time))
 		return (1);
 	philo->eat_count += 1;
-	if (philo->attr->min_eat >= 0 && philo->eat_count == philo->attr->min_eat)
+	if (philo->attr->min_eat >= 0 && (long) philo->eat_count == philo->attr->min_eat)
 	{
 		pthread_mutex_lock(&philo->app->global_mtx);
 		philo->app->state += 1;
