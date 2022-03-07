@@ -22,19 +22,21 @@ ifndef config
 	config	:= debug
 endif
 
-ifndef san
-	san	:= address
-endif
-
 ifeq ($(config), debug)
-	CFLAGS	+= -Og -fno-inline -g3 -fsanitize=$(san)
-	LFLAGS += -Og -fno-inline -fsanitize=$(san)
+	CFLAGS	+= -Og -fno-inline -g3
+	LFLAGS += -Og -fno-inline
+	ifdef san
+		CFLAGS += -fsanitize=$(san)
+		LFLAGS += -fsanitize=$(san)
+	endif
 else ifeq ($(config), release)
 	CFLAGS += -O2 -g1
 	LFLAGS += -O2
 else ifeq ($(config), distr)
 	CFLAGS += -O3 -g0
 	LFLAGS += -O3 -g0
+else
+$(error "unknown config '$(config)'")
 endif
 
 all: $(NAME)

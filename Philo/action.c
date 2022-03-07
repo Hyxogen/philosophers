@@ -17,6 +17,8 @@ int
 	int	success;
 
 	success = 0;
+	if (!fork)
+		return (0);
 	pthread_mutex_lock(&fork->mtx);
 	if (fork->user == NULL)
 	{
@@ -43,7 +45,7 @@ int
 			forks++;
 		if (ph_philo_take(philo, philo->rfork))
 			forks++;
-		usleep(100);
+		usleep(300);
 	}
 	return (ph_philo_is_dead(philo));
 }
@@ -56,18 +58,20 @@ int
 
 	ph_inform(philo, ac_start_eat);
 	now = ph_get_now();
-	if (now < 0)
-		return (-1);
-	philo->last_eat = now;
-	if (ph_philo_usleep(philo, philo->attr->eat_time))
-		return (1);
 	philo->eat_count += 1;
 	if (philo->attr->min_eat >= 0 && (long) philo->eat_count == philo->attr->min_eat)
 	{
 		pthread_mutex_lock(&philo->app->global_mtx);
 		philo->app->state += 1;
+		if (philo->app->state > 0 && (size_t) philo->app->state == philo->app->attr->count)
+			philo->app->state = -1;
 		pthread_mutex_unlock(&philo->app->global_mtx);
-	}	
+	}
+	if (now < 0)
+		return (-1);
+	philo->last_eat = now;
+	if (ph_philo_usleep(philo, philo->attr->eat_time))
+		return (1);
 	return (ph_philo_is_dead(philo));
 }
 

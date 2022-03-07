@@ -106,15 +106,9 @@ int
 	t_app			app;
 
 	if (argc != 5 && argc != 6)
-	{
-		printf("Usage: ./philo count time_to_die time_to_eat time_to_sleep [min_eat]\n");
 		return (EXIT_FAILURE);
-	}
 	if (ph_attr_setup(&attr, argc - 1, argv + 1) || ph_app_new(&app, &attr))
-	{
-		printf("An error ocurred while setting up the philosophers\n");
 		return (EXIT_FAILURE);
-	}
 	if (attr.min_eat == 0)
 		return (EXIT_SUCCESS);
 	if (ph_run(&app, &attr))
