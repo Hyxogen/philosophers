@@ -32,3 +32,22 @@ int
 		return (0);
 }
 
+int
+	ph_attr_setup(t_philo_attr *attr, int optc, char **vals)
+{
+	int	success;
+
+	success = 1;
+	success *= ft_atoiu((unsigned int *) &attr->count, vals[0]);
+	success *= ft_atoiu((unsigned int *) &attr->death_time, vals[1]);
+	success *= ft_atoiu((unsigned int *) &attr->eat_time, vals[2]);
+	success *= ft_atoiu((unsigned int *) &attr->sleep_time, vals[3]);
+	attr->min_eat = -1;
+	if (optc == 5)
+		success *= ft_atoiu((unsigned int *) &attr->min_eat, vals[4]);
+	attr->death_time *= 1000;
+	attr->eat_time *= 1000;
+	attr->sleep_time *= 1000;
+	return (success);
+}
+
