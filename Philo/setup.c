@@ -15,6 +15,7 @@ int		ph_philo_new(t_philo *philo, int id, t_philo_attr *attr, t_philo *right)
 		memset(philo, 0, sizeof(*philo));
 		philo->id = id;
 		philo->attr = attr;
+		ph_fork_new(&philo->lfork);
 		if (right)
 				philo->rfork = &right->lfork;
 		return (0);
