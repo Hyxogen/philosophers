@@ -10,13 +10,16 @@ int
 	ft_atoiu(unsigned int *out, const char *str)
 {
 	long	result;
+	int		len;
 
 	result = 0;
-	while (ft_isdigit(*str))
+	len = 0;
+	while (len < 12 && ft_isdigit(*str))
 	{
 		result = 10 * result + (*str - '0');
 		str++;
+		len++;
 	}
 	*out = (int) result;
-	return (result > UINT_MAX || *str != '\0');
+	return (result <= UINT_MAX && *str == '\0' && len < 12);
 }
