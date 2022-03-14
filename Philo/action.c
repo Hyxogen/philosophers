@@ -5,7 +5,6 @@ void
 	ph_philo_drop(t_philo *philo, t_fork *fork)
 {
 	(void) philo;
-
 	pthread_mutex_lock(&fork->mtx);
 	fork->user = NULL;
 	pthread_mutex_unlock(&fork->mtx);
@@ -38,7 +37,8 @@ int
 
 	forks = 0;
 	ph_inform(philo, ac_start_think);
-	while (forks < 2) {
+	while (forks < 2)
+	{
 		if (ph_philo_is_dead(philo))
 			return (1);
 		if (ph_philo_take(philo, &philo->lfork))
@@ -59,11 +59,13 @@ int
 	ph_inform(philo, ac_start_eat);
 	now = ph_get_now();
 	philo->eat_count += 1;
-	if (philo->attr->min_eat >= 0 && (long) philo->eat_count == philo->attr->min_eat)
+	if (philo->attr->min_eat >= 0
+		&& (long) philo->eat_count == philo->attr->min_eat)
 	{
 		pthread_mutex_lock(&philo->app->global_mtx);
 		philo->app->state += 1;
-		if (philo->app->state > 0 && (size_t) philo->app->state == philo->app->attr->count)
+		if (philo->app->state > 0
+			&& (size_t) philo->app->state == philo->app->attr->count)
 			philo->app->state = -1;
 		pthread_mutex_unlock(&philo->app->global_mtx);
 	}
@@ -85,4 +87,3 @@ int
 		return (1);
 	return (ph_philo_is_dead(philo));
 }
-
