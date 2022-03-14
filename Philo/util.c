@@ -14,7 +14,7 @@
 #include <sys/time.h>
 
 #ifndef PH_SLEEP_INTER
-# define PH_SLEEP_INTER 1000
+# define PH_SLEEP_INTER 500
 #else
 # if PH_SLEEP_INTER <= 0
 #  error PH_SLEEP_INTER must be a positive integer
