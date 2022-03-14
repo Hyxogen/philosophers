@@ -69,7 +69,8 @@ struct s_philo {
 };
 
 int		ph_fork_new(t_fork *fork);
-int		ph_philo_new(t_philo *philo, int id, t_philo_attr *attr, t_philo *right);
+int		ph_philo_new(t_philo *philo, int id,
+			t_philo_attr *attr, t_philo *right);
 int		ph_app_new(t_app *app, t_philo_attr *attr);
 
 int		ph_attr_setup(t_philo_attr *attr, int optc, char **vals);
