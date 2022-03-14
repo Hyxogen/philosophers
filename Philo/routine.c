@@ -64,10 +64,12 @@ void
 		int		state;
 
 		philo = param;
-		if (philo->id & 1)
-				usleep(500);
 		app = philo->app;
+		pthread_mutex_lock(&app->global_mtx);
+		pthread_mutex_unlock(&app->global_mtx);
 		philo->last_eat = ph_get_now();
+		if (philo->id & 1)
+				usleep(app->attr->eat_time);
 		while (!ph_should_stop(app))
 		{
 			state = ph_philo_wait(philo);

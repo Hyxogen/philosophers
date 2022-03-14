@@ -45,7 +45,7 @@ int
 			forks++;
 		if (ph_philo_take(philo, philo->rfork))
 			forks++;
-		usleep(300);
+		usleep(200);
 	}
 	return (ph_philo_is_dead(philo));
 }
