@@ -31,12 +31,13 @@ int
 }
 
 int
-	ph_philo_wait(t_philo *philo)
+	ph_philo_wait(t_philo *philo, int print_think)
 {
 	int	forks;
 
 	forks = 0;
-	ph_inform(philo, ac_start_think);
+	if (print_think)
+		ph_inform(philo, ac_start_think);
 	while (forks < 2)
 	{
 		if (ph_philo_is_dead(philo))
@@ -45,7 +46,7 @@ int
 			forks++;
 		if (ph_philo_take(philo, philo->rfork))
 			forks++;
-		usleep(200);
+		usleep(100);
 	}
 	return (ph_philo_is_dead(philo));
 }
