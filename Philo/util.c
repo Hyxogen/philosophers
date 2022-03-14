@@ -35,55 +35,55 @@ int
 int
 	ph_fork_destroy(t_fork *fork)
 {
-		if (pthread_mutex_destroy(&fork->mtx))
-				return (-1);
-		return (0);
+	if (pthread_mutex_destroy(&fork->mtx))
+		return (-1);
+	return (0);
 }
 
 long
 	ph_get_now(void)
 {
-		struct timeval val;
+	struct timeval	val;
 
-		if (gettimeofday(&val, NULL) == -1)
-				return (-1);
-		return ((val.tv_sec * 1000000) + val.tv_usec);
+	if (gettimeofday(&val, NULL) == -1)
+		return (-1);
+	return ((val.tv_sec * 1000000) + val.tv_usec);
 }
 
 long
 	ph_get_timestamp(t_app *app)
 {
-		long	now;
+	long	now;
 
-		now = ph_get_now();
-		if (now < 0)
-				return (-1);
-		return ((now - app->start) / 1000);
+	now = ph_get_now();
+	if (now < 0)
+		return (-1);
+	return ((now - app->start) / 1000);
 }
 
 int
 	ph_philo_usleep(t_philo *philo, long microseconds)
 {
-		long	now;
-		long	death;	
+	long	now;
+	long	death;	
 
-		now = ph_get_now();
-		death = philo->last_eat += philo->attr->death_time;
-		microseconds += now;
-		while (now >= 0 && now <= microseconds && now < death)
+	now = ph_get_now();
+	death = philo->last_eat + philo->attr->death_time;
+	microseconds += now;
+	while (now >= 0 && now <= microseconds && now < death)
+	{
+		if (now + PH_SLEEP_INTER >= death)
 		{
-				if (now + PH_SLEEP_INTER >= death)
-				{
-						usleep(death - now);
-						return (1);
-				}
-				else if (now + PH_SLEEP_INTER >= microseconds)
-						usleep(microseconds - now);
-				else
-					usleep(PH_SLEEP_INTER);
-				now = ph_get_now();
+			usleep(death - now);
+			return (1);
 		}
-		if (now < 0)
-				return (-1);
-		return (now >= death);
+		else if (now + PH_SLEEP_INTER >= microseconds)
+			usleep(microseconds - now);
+		else
+			usleep(PH_SLEEP_INTER);
+		now = ph_get_now();
+	}
+	if (now < 0)
+		return (-1);
+	return (now >= death);
 }
