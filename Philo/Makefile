@@ -33,8 +33,8 @@ else ifeq ($(config), release)
 	CFLAGS += -O2 -g1
 	LFLAGS += -O2
 else ifeq ($(config), distr)
-	CFLAGS += -O3 -g0
-	LFLAGS += -O3 -g0
+	CFLAGS += -Ofast -g0
+	LFLAGS += -Ofast -g0
 else
 $(error "unknown config '$(config)'")
 endif
