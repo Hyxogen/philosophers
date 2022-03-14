@@ -26,11 +26,13 @@ void
 	};
 
 	pthread_mutex_lock(&philo->app->global_mtx);
-	if ((philo->app->state >= 0 && (size_t) philo->app->state < philo->app->attr->count) || (action == ac_die && philo->app->state < 0))
+	if ((philo->app->state >= 0
+			&& (size_t) philo->app->state < philo->app->attr->count)
+		|| (action == ac_die && philo->app->state < 0))
 		printf(messages[action], ph_get_timestamp(philo->app), philo->id);
 	pthread_mutex_unlock(&philo->app->global_mtx);
 }
-	
+
 int
 	ph_stop(t_app *app)
 {
@@ -57,41 +59,45 @@ int
 }
 
 void
-	*ph_philo_run(void *param)
+	ph_philo_routine(t_philo *philo, t_app *app)
 {
-		t_philo	*philo;
-		t_app	*app;
-		int		state;
+	int	state;
+	int	first;
 
-		philo = param;
-		app = philo->app;
-		pthread_mutex_lock(&app->global_mtx);
-		pthread_mutex_unlock(&app->global_mtx);
-		philo->last_eat = ph_get_now();
-		if (philo->id & 1)
-				usleep(app->attr->eat_time);
-		while (!ph_should_stop(app))
+	state = 0;
+	first = 1;
+	ph_inform(philo, ac_start_think);
+	philo->last_eat = ph_get_now();
+	if (philo->id & 1)
+		ph_philo_usleep(philo, app->attr->eat_time);
+	while (!ph_should_stop(app))
+	{
+		state = ph_philo_wait(philo, !first);
+		first = 0;
+		if (!state)
+			state = ph_philo_eat(philo);
+		if (!state)
+			state = ph_philo_sleep(philo);
+		if (state < 0)
+			return ;
+		if (state == 1 && !(ph_stop(app)))
 		{
-			state = ph_philo_wait(philo);
-			if (!state)
-				state = ph_philo_eat(philo);
-			if (!state)
-				state = ph_philo_sleep(philo);
-			if (state < 0)
-				return (NULL);
-			if (state == 1 && !(ph_stop(app)))
-			{
-				ph_inform(philo, ac_die);
-				return (NULL);
-			}
+			ph_inform(philo, ac_die);
+			return ;
 		}
-		return (NULL);
+	}
 }
 
-int
-	ph_philo_start(t_philo *philo)
+void
+	*ph_philo_run(void *param)
 {
-	if (pthread_create(&philo->thread, NULL, ph_philo_run, philo))
-		return (-1);
-	return (0);
+	t_philo	*philo;
+	t_app	*app;
+
+	philo = param;
+	app = philo->app;
+	pthread_mutex_lock(&app->global_mtx);
+	pthread_mutex_unlock(&app->global_mtx);
+	ph_philo_routine(philo, app);
+	return (NULL);
 }

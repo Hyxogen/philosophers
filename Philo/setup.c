@@ -49,5 +49,13 @@ int
 	attr->death_time *= 1000;
 	attr->eat_time *= 1000;
 	attr->sleep_time *= 1000;
-	return (success);
+	return (!success);
+}
+
+int
+	ph_philo_start(t_philo *philo)
+{
+	if (pthread_create(&philo->thread, NULL, ph_philo_run, philo))
+		return (-1);
+	return (0);
 }
