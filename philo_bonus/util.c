@@ -1,10 +1,9 @@
 #include "philo.h"
 
+#include <sys/errno.h>
+#include <sysexits.h>
 #include <stdlib.h>
 #include <signal.h>
-#include <errno.h>
-#include <sysexits.h>
-#include <unistd.h>
 
 void
 	*ph_safe_malloc(size_t size)
@@ -13,52 +12,35 @@ void
 
 	ptr = malloc(size);
 	if (!ptr)
-		kill(0, SIGKILL);
+		exit(EX_UNAVAILABLE);
 	return (ptr);
 }
 
 void
-	ph_sem_wait(t_app *app, sem_t *sem)
+	ph_philo_quit(t_app *app, int status)
 {
-	int rc;
-
-	while (1)
-	{
-		rc = sem_wait(sem);
-		if (rc < 0)
-		{
-			if (errno != EINTR)
-				ph_quit(app, EX_OSERR);
-			continue;
-		}
-		break;
-	}
-}	
-
-void
-	ph_sem_post(t_app *app, sem_t *sem)
-{
-	int rc;
-
-	rc = sem_post(sem);
-	if (rc < 0)
-		ph_quit(app, EX_OSERR);
+	(void) app;
+	exit(status);
 }
 
 void
-	ph_usleep(t_app *app, useconds_t microseconds)
+	ph_app_quit(t_app *app, int status)
 {
-	int	rc;
+	(void) status;
+	ph_stop_philos(app);
+}
 
-	while (1)
+void
+	ph_stop_philos(t_app *app)
+{
+	pid_t	*childs;
+
+	childs = app->childs;
+	while (*childs)
 	{
-		rc = usleep(microseconds);
-		if (rc < 0)
-		{
-			if (rc != EINTR)
-				ph_quit(app, EX_OSERR);
-			continue ;
-		}
-		break ;
+		if (kill(*childs, SIGTERM) < 0 )
+			if (errno != ESRCH)
+				exit(EX_OSERR);
+		childs++;
 	}
 }

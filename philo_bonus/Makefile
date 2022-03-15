@@ -10,7 +10,7 @@ SRC_DIR		:= .
 OBJ_DIR		:= ./obj
 VPATH		:= $(SRC_DIR)
 
-SRC_FILES	:= main.c util.c routine.c setup.c action.c atoui.c
+SRC_FILES	:= main.c util.c routine.c setup.c syscall.c syscall_extra.c atoui.c time.c
 OBJ_FILES	:= $(addprefix $(OBJ_DIR)/,$(SRC_FILES:%.c=%.o))
 
 SILENT		:= @
