@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <signal.h>
 
+
+#include <stdio.h>
+
 void
 	*ph_safe_malloc(size_t size)
 {

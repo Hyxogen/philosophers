@@ -17,6 +17,9 @@
 # ifndef PH_EAT_SEM_NAME
 #  define PH_EAT_SEM_NAME "pheatsem"
 # endif
+# ifndef PH_START_SEM_NAME
+#  define PH_START_SEM_NAME "phstartsem"
+# endif
 
 typedef enum e_action {
 	ac_take_fork,
@@ -38,9 +41,10 @@ typedef struct s_app {
 	sem_t			*global_sem;
 	sem_t			*eat_sem;
 	sem_t			*fork_sem;
+	sem_t			*start_sem;
 	long			start;
 	pid_t			*childs;
-	t_philo_attr	attr;
+	t_philo_attr	*attr;
 	pthread_t		monitor_thread;
 }	t_app;
 
@@ -59,7 +63,7 @@ typedef void (*exception_proc_t)(t_app*,int);
 /* Only called in main process */
 void	*ph_safe_malloc(size_t size);
 
-int		ph_app_new(t_app *app);
+int		ph_app_new(t_app *app, t_philo_attr *attr);
 int		ph_attr_setup(t_philo_attr *attr, int count, char **vals);
 void	ph_philo_new(t_philo *philo, int id, t_app *app);
 

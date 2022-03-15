@@ -8,6 +8,9 @@
 #include <string.h>
 #include <pthread.h>
 
+#include <stdio.h>
+#include <semaphore.h>
+
 void
 	*ph_monitor(void *app_ptr)
 {
@@ -15,10 +18,12 @@ void
 	int		index;
 
 	app = app_ptr;
-	index = app->attr.count;
+	index = app->attr->count;
+	ph_usleep(app, app->attr->eat_time, ph_app_quit);
 	while (index)
 	{
 		ph_sem_wait(app, app->eat_sem, ph_app_quit);
+		printf("Only %d more times!\n", index - 1);
 		index--;
 	}
 	ph_stop_philos(app);
@@ -33,7 +38,7 @@ int
 	if (ph_waitpid(app, 0, &stat, WUNTRACED) < 0)
 		return (-1);
 	ph_stop_philos(app);
-	while (!ph_waitpid(app, 0, NULL, WUNTRACED))
+	while (ph_waitpid(app, 0, NULL, WUNTRACED) > 0)
 		continue ;
 	return (-WIFSIGNALED(stat));
 }
@@ -49,7 +54,7 @@ int
 		return (EX_OSERR);
 	}
 	rc = ph_wait_philos_exit(app);
-	pthread_join(app->monitor_thread, NULL);
+	//pthread_join(app->monitor_thread, NULL);
 	return (rc);
 }
 
@@ -60,10 +65,11 @@ int
 	t_philo			philo;
 
 	index = 0;
-	app->childs = ph_safe_malloc(sizeof(*app->childs) * (app->attr.count + 1));
-	memset(app->childs, 0, sizeof(*app->childs) * (app->attr.count + 1));
-	ph_sem_wait(app, app->global_sem, ph_app_quit); /* Will not properly close on error */
-	while (index < app->attr.count)
+	app->childs = ph_safe_malloc(sizeof(*app->childs) * (app->attr->count + 1));
+	memset(app->childs, 0, sizeof(*app->childs) * (app->attr->count + 1));
+	ph_sem_wait(app, app->start_sem, ph_app_quit); /* Will not properly close on error */
+	app->start = ph_get_now(app, ph_app_quit);
+	while (index < app->attr->count)
 	{
 		ph_philo_new(&philo, index, app);
 		app->childs[index] = ph_philo_start(&philo);
@@ -72,24 +78,24 @@ int
 			ph_stop_philos(app);
 			return (EX_OSERR);
 		}
-		index--;
+		index++;
 	}
-	app->start = ph_get_now(app, ph_app_quit);
-	ph_sem_post(app, app->global_sem, ph_app_quit);
+	ph_sem_post(app, app->start_sem, ph_app_quit);
 	return (ph_wait_philos(app));
 }
 
 int
 	main(int argc, char **argv)
 {
-	int		rc;
-	t_app 	app;
+	int				rc;
+	t_app 			app;
+	t_philo_attr	attr;
 
 	if (argc != 5 && argc != 6)
 		return (EX_USAGE);
-	ph_app_new(&app);
-	if (ph_attr_setup(&app.attr, argc - 1, argv + 1))
+	if (ph_attr_setup(&attr, argc - 1, argv + 1))
 		return (EX_USAGE);
+	ph_app_new(&app, &attr);
 	rc = ph_run(&app);
 	free(app.childs);
 	return (rc);

@@ -34,12 +34,12 @@ void
 	t_philo	*philo;
 
 	philo = philo_ptr;
-	death_time = philo->last_eat;
+	death_time = philo->attr->death_time;
 	app = philo->app;
 	while (1)
 	{
 		now = ph_get_now(app, ph_philo_quit);
-		time_to_death = philo->last_eat + death_time - now;
+		time_to_death = (philo->last_eat + death_time) - now;
 		if (time_to_death <= 0)
 		{
 			ph_inform(philo, ac_die);
@@ -57,15 +57,19 @@ int
 	long	eat_time;
 	t_app	*app;
 
-	sleep_time = philo->attr->sleep_time;
+	sleep_time = philo->attr->sleep_time + 200;
 	eat_time = philo->attr->eat_time;
 	app = philo->app;
 	while (1)
 	{
 		ph_inform(philo, ac_think);
 		ph_sem_wait(app, philo->fork_sem, ph_philo_quit);
+		ph_inform(philo, ac_take_fork);
+		ph_inform(philo, ac_take_fork);
 		ph_inform(philo, ac_eat);
+		philo->last_eat = ph_get_now(app, ph_philo_quit);
 		ph_usleep(app, eat_time, ph_philo_quit);
+		ph_sem_post(app, philo->fork_sem, ph_philo_quit);
 		ph_inform(philo, ac_sleep);
 		ph_usleep(app, sleep_time, ph_philo_quit);
 	}
