@@ -87,7 +87,6 @@ int
 
 	if (argc != 5 && argc != 6)
 		return (EX_USAGE);
-	printf("%d\n", PSEMNAMLEN);
 	ph_app_new(&app);
 	if (ph_attr_setup(&app.attr, argc - 1, argv + 1))
 		return (EX_USAGE);
