@@ -66,7 +66,7 @@ int
 int
 	ph_run(t_app *app)
 {
-	unsigned int 	index;
+	unsigned int	index;
 	t_philo			philo;
 
 	index = 0;
@@ -93,7 +93,7 @@ int
 	main(int argc, char **argv)
 {
 	int				rc;
-	t_app 			app;
+	t_app			app;
 	t_philo_attr	attr;
 
 	if (argc != 5 && argc != 6)

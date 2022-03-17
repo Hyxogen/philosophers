@@ -8,14 +8,14 @@
 void
 	ph_inform(t_philo *philo, t_action action)
 {
-	const static char *messages[] = {
+	const static char	*messages[] = {
 		"%d %d has taken a fork\n",
 		"%d %d is eating\n",
 		"%d %d is thinking\n",
 		"%d %d is sleeping\n",
 		"%d %d died\n"
 	};
-	t_app	*app;
+	t_app				*app;
 
 	app = philo->app;
 	ph_sem_wait(app, app->global_sem, ph_process_exit);

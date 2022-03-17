@@ -5,9 +5,6 @@
 #include <stdlib.h>
 #include <signal.h>
 
-
-#include <stdio.h>
-
 void
 	*ph_safe_malloc(size_t size)
 {
@@ -41,7 +38,7 @@ void
 	childs = app->childs;
 	while (*childs)
 	{
-		if (kill(*childs, SIGTERM) < 0 )
+		if (kill(*childs, SIGTERM) < 0)
 			if (errno != ESRCH)
 				exit(EX_OSERR);
 		childs++;

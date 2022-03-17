@@ -6,9 +6,6 @@
 #include <sys/stat.h>
 #include <string.h>
 
-
-#include <stdio.h>
-
 void
 	ph_philo_new(t_philo *philo, int id, t_app *app)
 {
@@ -49,10 +46,14 @@ int
 	ph_sem_unlink(PH_FORK_SEM_NAME);
 	ph_sem_unlink(PH_APP_BIN_SEM);
 	app->attr = attr;
-	app->global_sem = ph_sem_open(PH_GLOBAL_SEM_NAME, O_CREAT, S_IRWXU, 1);
-	app->eat_sem = ph_sem_open(PH_EAT_SEM_NAME, O_CREAT, S_IRWXU, app->attr->count);
-	app->fork_sem = ph_sem_open(PH_FORK_SEM_NAME, O_CREAT, S_IRWXU, app->attr->count / 2);
-	app->bin_sem = ph_sem_open(PH_APP_BIN_SEM, O_CREAT, S_IRWXU, 1);
+	app->global_sem
+		= ph_sem_open(PH_GLOBAL_SEM_NAME, O_CREAT, S_IRWXU, 1);
+	app->eat_sem
+		= ph_sem_open(PH_EAT_SEM_NAME, O_CREAT, S_IRWXU, app->attr->count);
+	app->fork_sem
+		= ph_sem_open(PH_FORK_SEM_NAME, O_CREAT, S_IRWXU, app->attr->count / 2);
+	app->bin_sem
+		= ph_sem_open(PH_APP_BIN_SEM, O_CREAT, S_IRWXU, 1);
 	return (0);
 }
 
@@ -72,7 +73,8 @@ int
 	ph_sem_wait(app, app->eat_sem, ph_process_exit);
 	ph_sem_post(app, app->bin_sem, ph_process_exit);
 	philo->last_eat = ph_get_now(app, ph_process_exit);
-	if (pthread_create(&philo->expire_thread, NULL, ph_philo_expire_routine, philo))
+	if (pthread_create(&philo->expire_thread,
+			NULL, ph_philo_expire_routine, philo))
 		ph_process_exit(philo->app, EX_OSERR);
 	ph_philo_main_routine(philo);
 	return (-1);
