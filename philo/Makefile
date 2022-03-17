@@ -3,7 +3,7 @@ NAME		:= philo
 CC			:= clang
 LINK_CMD	:= clang
 
-CFLAGS		:= -std=c89 -Wall -Wextra -pedantic
+CFLAGS		:= -std=c89 -Wall -Wextra -Werror -pedantic
 LFLAGS		:=
 
 SRC_DIR		:= .
