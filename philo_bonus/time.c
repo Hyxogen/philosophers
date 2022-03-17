@@ -3,13 +3,10 @@
 #include <sysexits.h>
 #include <sys/time.h>
 
-
-#include <stdio.h>
-
 long
 	ph_get_now(t_app *app, exception_proc_t exception_proc)
 {
-	struct timeval val;
+	struct timeval	val;
 
 	if (gettimeofday(&val, NULL) < 0)
 		exception_proc(app, EX_OSERR);
