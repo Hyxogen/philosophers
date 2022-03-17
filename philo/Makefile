@@ -19,7 +19,7 @@ ifdef verbose
 endif
 
 ifndef config
-	config	:= debug
+	config	:= distr
 endif
 
 ifeq ($(config), debug)
