@@ -4,7 +4,7 @@
 #include <sys/time.h>
 
 long
-	ph_get_now(t_app *app, exception_proc_t exception_proc)
+	ph_get_now(t_app *app, t_exception_proc exception_proc)
 {
 	struct timeval	val;
 
@@ -14,7 +14,7 @@ long
 }
 
 long
-	ph_get_timestamp(t_app *app, exception_proc_t exception_proc)
+	ph_get_timestamp(t_app *app, t_exception_proc exception_proc)
 {
 	return ((ph_get_now(app, exception_proc) - app->start) / 1000L);
 }

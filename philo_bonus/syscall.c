@@ -33,7 +33,7 @@ sem_t
 }
 
 void
-	ph_sem_wait(t_app *app, sem_t *sem, exception_proc_t exception_proc)
+	ph_sem_wait(t_app *app, sem_t *sem, t_exception_proc exception_proc)
 {
 	int	rc;
 
@@ -51,7 +51,7 @@ void
 }	
 
 void
-	ph_sem_post(t_app *app, sem_t *sem, exception_proc_t exception_proc)
+	ph_sem_post(t_app *app, sem_t *sem, t_exception_proc exception_proc)
 {
 	int	rc;
 
@@ -62,7 +62,7 @@ void
 
 void
 	ph_usleep(t_app *app, useconds_t microseconds,
-			exception_proc_t exception_proc)
+			t_exception_proc exception_proc)
 {
 	int	rc;
 

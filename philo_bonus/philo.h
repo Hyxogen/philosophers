@@ -59,7 +59,7 @@ typedef struct s_philo {
 	pthread_t		expire_thread;
 }	t_philo;
 
-typedef void (*exception_proc_t)(t_app*,int);
+typedef void (*t_exception_proc)(t_app*,int);
 
 /* Only called in main process */
 void	*ph_safe_malloc(size_t size);
@@ -84,11 +84,11 @@ void	ph_philo_die(t_philo *philo);
 void	ph_process_exit(t_app *app, int status);
 void	ph_app_quit(t_app *app, int status);
 
-void	ph_usleep(t_app *app, useconds_t microseconds, exception_proc_t exception_proc);
-long	ph_get_now(t_app *app, exception_proc_t exception_proc);
-long	ph_get_timestamp(t_app *app, exception_proc_t exception_proc);
-void	ph_sem_wait(t_app *app, sem_t *sem, exception_proc_t exception_proc);
-void	ph_sem_post(t_app *app, sem_t *sem, exception_proc_t exception_proc);
+void	ph_usleep(t_app *app, useconds_t microseconds, t_exception_proc exception_proc);
+long	ph_get_now(t_app *app, t_exception_proc exception_proc);
+long	ph_get_timestamp(t_app *app, t_exception_proc exception_proc);
+void	ph_sem_wait(t_app *app, sem_t *sem, t_exception_proc exception_proc);
+void	ph_sem_post(t_app *app, sem_t *sem, t_exception_proc exception_proc);
 
 /* Only called in main process */ 
 sem_t	*ph_sem_open(const char *name, int oflag, mode_t mode, int num);
