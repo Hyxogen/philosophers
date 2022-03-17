@@ -15,7 +15,7 @@ int
 		if (rc < 0)
 		{
 			if (errno == EINTR)
-			   continue;
+				continue ;
 			else
 				ph_app_quit(app, EX_OSERR);
 		}
