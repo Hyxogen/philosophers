@@ -87,3 +87,23 @@ int
 		return (-1);
 	return (now >= death);
 }
+/*
+int
+	ph_philo_usleep(t_philo *philo, long microseconds)
+{
+	long	now;
+	long	death;
+
+	now = ph_get_now();
+	if (now < 0)
+		return (-1);
+	death = philo->last_eat + philo->attr->death_time;
+	if (now + microseconds >= death)
+	{
+		usleep(death - now);
+		return (1);
+	}
+	usleep(microseconds);
+	return (0);
+}
+*/
