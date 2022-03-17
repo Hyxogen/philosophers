@@ -5,6 +5,10 @@
 #include <sysexits.h>
 #include <stdio.h>
 
+#ifndef PH_EXPIRE_CHECK_INTERVAL
+# define PH_EXPIRE_CHECK_INTERVAL 10
+#endif
+
 void
 	ph_inform(t_philo *philo, t_action action)
 {
@@ -29,7 +33,7 @@ void
 {
 	long	death_time;
 	long	now;
-	long	time_to_death;
+	long	last_eat;
 	t_app	*app;
 	t_philo	*philo;
 
@@ -39,15 +43,25 @@ void
 	while (1)
 	{
 		now = ph_get_now(app, ph_process_exit);
-		time_to_death = (philo->last_eat + death_time) - now;
-		if (time_to_death <= 0)
+		ph_sem_wait(app, philo->bin_sem, ph_process_exit);
+		last_eat = philo->last_eat;
+		ph_sem_post(app, philo->bin_sem, ph_process_exit);
+		if (now >= last_eat + death_time)
 		{
 			ph_inform(philo, ac_die);
 			ph_process_exit(app, EX_OK);
 		}
-		ph_usleep(app, time_to_death, ph_process_exit);
+		ph_usleep(app, 10, ph_process_exit);
 	}
 	return (NULL);
+}
+
+static void
+	ph_philo_set_last_eat(t_app *app, t_philo *philo, long time)
+{
+	ph_sem_wait(app, philo->bin_sem, ph_process_exit);
+	philo->last_eat = time;
+	ph_sem_post(app, philo->bin_sem, ph_process_exit);
 }
 
 int
@@ -67,7 +81,7 @@ int
 		ph_inform(philo, ac_take_fork);
 		ph_inform(philo, ac_take_fork);
 		ph_inform(philo, ac_eat);
-		philo->last_eat = ph_get_now(app, ph_process_exit);
+		ph_philo_set_last_eat(app, philo, ph_get_now(app, ph_process_exit));
 		philo->eat_count += (philo->eat_count < app->attr->min_eat);
 		if (philo->eat_count == app->attr->min_eat)
 			ph_sem_post(app, app->eat_sem, ph_process_exit);

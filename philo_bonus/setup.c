@@ -69,6 +69,8 @@ int
 		return (-1);
 	else if (pid)
 		return (pid);
+	ph_sem_unlink(PH_PHILO_BIN_SEM);
+	philo->bin_sem = ph_sem_open(PH_PHILO_BIN_SEM, O_CREAT, S_IRWXU, 1);
 	ph_sem_wait(app, app->bin_sem, ph_process_exit);
 	ph_sem_wait(app, app->eat_sem, ph_process_exit);
 	ph_sem_post(app, app->bin_sem, ph_process_exit);

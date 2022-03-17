@@ -20,6 +20,9 @@
 # ifndef PH_APP_BIN_SEM
 #  define PH_APP_BIN_SEM "phappbinsem"
 # endif
+# ifndef PH_PHILO_BIN_SEM
+#  define PH_PHILO_BIN_SEM "phphilobinsem"
+# endif
 
 typedef enum e_action {
 	ac_take_fork,
@@ -55,6 +58,7 @@ typedef struct s_philo {
 	t_philo_attr	*attr;
 	t_app			*app;
 	sem_t			*fork_sem;
+	sem_t			*bin_sem;
 	int				id;
 	pthread_t		expire_thread;
 }	t_philo;

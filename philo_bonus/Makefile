@@ -3,7 +3,7 @@ NAME		:= philo_bonus
 CC			:= clang
 LINK_CMD	:= clang
 
-CFLAGS		:= -std=c89 -Wall -Wextra -pedantic
+CFLAGS		:= -std=c89 -Wall -Wextra -Werror -pedantic
 LFLAGS		:=
 
 SRC_DIR		:= .
@@ -19,7 +19,7 @@ ifdef verbose
 endif
 
 ifndef config
-	config	:= debug
+	config	:= distr
 endif
 
 ifeq ($(config), debug)
