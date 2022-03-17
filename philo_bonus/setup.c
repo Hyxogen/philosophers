@@ -74,7 +74,9 @@ int
 	ph_sem_wait(app, app->bin_sem, ph_process_exit);
 	ph_sem_wait(app, app->eat_sem, ph_process_exit);
 	ph_sem_post(app, app->bin_sem, ph_process_exit);
+	ph_sem_wait(app, philo->bin_sem, ph_process_exit);
 	philo->last_eat = ph_get_now(app, ph_process_exit);
+	ph_sem_post(app, philo->bin_sem, ph_process_exit);
 	if (pthread_create(&philo->expire_thread,
 			NULL, ph_philo_expire_routine, philo))
 		ph_process_exit(philo->app, EX_OSERR);
