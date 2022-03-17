@@ -19,7 +19,7 @@ void
 
 	app = philo->app;
 	ph_sem_wait(app, app->global_sem, ph_process_exit);
-	printf(messages[action], ph_get_timestamp(app, ph_process_exit), philo->id);
+	printf(messages[action], ph_get_timestamp(app, ph_process_exit), philo->id + 1);
 	if (action != ac_die)
 		ph_sem_post(app, app->global_sem, ph_process_exit);
 }

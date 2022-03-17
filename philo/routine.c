@@ -29,7 +29,7 @@ void
 	if ((philo->app->state >= 0
 			&& (size_t) philo->app->state < philo->app->attr->count)
 		|| (action == ac_die && philo->app->state < 0))
-		printf(messages[action], ph_get_timestamp(philo->app), philo->id);
+		printf(messages[action], ph_get_timestamp(philo->app), philo->id + 1);
 	pthread_mutex_unlock(&philo->app->global_mtx);
 }
 
