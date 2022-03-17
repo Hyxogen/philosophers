@@ -1,7 +1,6 @@
 #ifndef PHILO_H
 # define PHILO_H
 
-# include <sys/_types/_useconds_t.h>
 # include <sys/types.h>
 # include <semaphore.h>
 
