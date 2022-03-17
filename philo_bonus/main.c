@@ -23,9 +23,11 @@ void
 	while (index)
 	{
 		ph_sem_wait(app, app->eat_sem, ph_app_quit);
-		printf("Only %d more times!\n", index - 1);
 		index--;
 	}
+	ph_sem_wait(app, app->bin_sem, ph_app_quit);
+	app->done = 1;
+	ph_sem_post(app, app->bin_sem, ph_app_quit);
 	ph_stop_philos(app);
 	return (NULL);
 }
@@ -40,7 +42,7 @@ int
 	ph_stop_philos(app);
 	while (ph_waitpid(app, 0, NULL, WUNTRACED) > 0)
 		continue ;
-	return (-WIFSIGNALED(stat));
+	return (WIFSIGNALED(stat) * EX_SOFTWARE);
 }
 
 int
@@ -53,8 +55,11 @@ int
 		ph_stop_philos(app);
 		return (EX_OSERR);
 	}
+	pthread_detach(app->monitor_thread);
 	rc = ph_wait_philos_exit(app);
-	//pthread_join(app->monitor_thread, NULL);
+	ph_sem_wait(app, app->bin_sem, ph_app_quit);
+	rc *= !app->done;
+	ph_sem_post(app, app->bin_sem, ph_app_quit);
 	return (rc);
 }
 
@@ -67,7 +72,7 @@ int
 	index = 0;
 	app->childs = ph_safe_malloc(sizeof(*app->childs) * (app->attr->count + 1));
 	memset(app->childs, 0, sizeof(*app->childs) * (app->attr->count + 1));
-	ph_sem_wait(app, app->start_sem, ph_app_quit); /* Will not properly close on error */
+	ph_sem_wait(app, app->bin_sem, ph_process_exit);
 	app->start = ph_get_now(app, ph_app_quit);
 	while (index < app->attr->count)
 	{
@@ -80,7 +85,7 @@ int
 		}
 		index++;
 	}
-	ph_sem_post(app, app->start_sem, ph_app_quit);
+	ph_sem_post(app, app->bin_sem, ph_app_quit);
 	return (ph_wait_philos(app));
 }
 
@@ -95,6 +100,8 @@ int
 		return (EX_USAGE);
 	if (ph_attr_setup(&attr, argc - 1, argv + 1))
 		return (EX_USAGE);
+	if (attr.min_eat == 0)
+		return (EX_OK);
 	ph_app_new(&app, &attr);
 	rc = ph_run(&app);
 	free(app.childs);

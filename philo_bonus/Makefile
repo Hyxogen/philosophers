@@ -1,4 +1,4 @@
-NAME		:= philo
+NAME		:= philo_bonus
 
 CC			:= clang
 LINK_CMD	:= clang

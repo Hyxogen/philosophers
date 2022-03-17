@@ -20,7 +20,7 @@ void
 }
 
 void
-	ph_philo_quit(t_app *app, int status)
+	ph_process_exit(t_app *app, int status)
 {
 	(void) app;
 	exit(status);

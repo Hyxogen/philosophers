@@ -5,9 +5,6 @@
 # include <sys/types.h>
 # include <semaphore.h>
 
-# ifndef PH_GLOBAL_SEM_NAME
-#  define PH_GLOBAL_SEM_NAME "phglobalsem"
-# endif
 # ifndef PH_DMS_SEM_NAME
 #  define PH_DMS_SEM_NAME "phdmssem"
 # endif
@@ -17,8 +14,11 @@
 # ifndef PH_EAT_SEM_NAME
 #  define PH_EAT_SEM_NAME "pheatsem"
 # endif
-# ifndef PH_START_SEM_NAME
-#  define PH_START_SEM_NAME "phstartsem"
+# ifndef PH_GLOBAL_SEM_NAME
+#  define PH_GLOBAL_SEM_NAME "phglobalsem"
+# endif
+# ifndef PH_APP_BIN_SEM
+#  define PH_APP_BIN_SEM "phappbinsem"
 # endif
 
 typedef enum e_action {
@@ -41,10 +41,11 @@ typedef struct s_app {
 	sem_t			*global_sem;
 	sem_t			*eat_sem;
 	sem_t			*fork_sem;
-	sem_t			*start_sem;
+	sem_t			*bin_sem;
 	long			start;
 	pid_t			*childs;
 	t_philo_attr	*attr;
+	int				done;
 	pthread_t		monitor_thread;
 }	t_app;
 
@@ -80,7 +81,7 @@ int		ph_philo_main_routine(t_philo *philo);
 
 void	ph_philo_die(t_philo *philo);
 
-void	ph_philo_quit(t_app *app, int status);
+void	ph_process_exit(t_app *app, int status);
 void	ph_app_quit(t_app *app, int status);
 
 void	ph_usleep(t_app *app, useconds_t microseconds, exception_proc_t exception_proc);

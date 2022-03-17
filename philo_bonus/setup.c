@@ -1,6 +1,5 @@
 #include "philo.h"
 
-#include <sys/_types/_s_ifmt.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <sysexits.h>
@@ -31,8 +30,10 @@ int
 	success *= ft_atoiu((unsigned int *) &attr->death_time, vals[1]);
 	success *= ft_atoiu((unsigned int *) &attr->eat_time, vals[2]);
 	success *= ft_atoiu((unsigned int *) &attr->sleep_time, vals[3]);
-	attr->min_eat = -1; if (optc == 5)
+	if (optc == 5)
 		success *= ft_atoiu((unsigned int *) &attr->min_eat, vals[4]);
+	else
+		attr->min_eat = -1;
 	attr->death_time *= 1000;
 	attr->eat_time *= 1000;
 	attr->sleep_time *= 1000;
@@ -46,12 +47,12 @@ int
 	ph_sem_unlink(PH_GLOBAL_SEM_NAME);
 	ph_sem_unlink(PH_EAT_SEM_NAME);
 	ph_sem_unlink(PH_FORK_SEM_NAME);
-	ph_sem_unlink(PH_START_SEM_NAME);
+	ph_sem_unlink(PH_APP_BIN_SEM);
 	app->attr = attr;
 	app->global_sem = ph_sem_open(PH_GLOBAL_SEM_NAME, O_CREAT, S_IRWXU, 1);
 	app->eat_sem = ph_sem_open(PH_EAT_SEM_NAME, O_CREAT, S_IRWXU, app->attr->count);
 	app->fork_sem = ph_sem_open(PH_FORK_SEM_NAME, O_CREAT, S_IRWXU, app->attr->count / 2);
-	app->start_sem = ph_sem_open(PH_START_SEM_NAME, O_CREAT, S_IRWXU, 1);
+	app->bin_sem = ph_sem_open(PH_APP_BIN_SEM, O_CREAT, S_IRWXU, 1);
 	return (0);
 }
 
@@ -67,12 +68,12 @@ int
 		return (-1);
 	else if (pid)
 		return (pid);
-	ph_sem_wait(app, app->start_sem, ph_philo_quit);
-	ph_sem_wait(app, app->eat_sem, ph_philo_quit);
-	ph_sem_post(app, app->start_sem, ph_philo_quit);
-	philo->last_eat = ph_get_now(app, ph_philo_quit);
+	ph_sem_wait(app, app->bin_sem, ph_process_exit);
+	ph_sem_wait(app, app->eat_sem, ph_process_exit);
+	ph_sem_post(app, app->bin_sem, ph_process_exit);
+	philo->last_eat = ph_get_now(app, ph_process_exit);
 	if (pthread_create(&philo->expire_thread, NULL, ph_philo_expire_routine, philo))
-		ph_philo_quit(philo->app, EX_OSERR);
+		ph_process_exit(philo->app, EX_OSERR);
 	ph_philo_main_routine(philo);
 	return (-1);
 }

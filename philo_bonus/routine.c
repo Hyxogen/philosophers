@@ -18,10 +18,10 @@ void
 	t_app	*app;
 
 	app = philo->app;
-	ph_sem_wait(app, app->global_sem, ph_philo_quit);
-	printf(messages[action], ph_get_timestamp(app, ph_philo_quit), philo->id);
+	ph_sem_wait(app, app->global_sem, ph_process_exit);
+	printf(messages[action], ph_get_timestamp(app, ph_process_exit), philo->id);
 	if (action != ac_die)
-		ph_sem_post(app, app->global_sem, ph_philo_quit);
+		ph_sem_post(app, app->global_sem, ph_process_exit);
 }
 
 void
@@ -38,14 +38,14 @@ void
 	app = philo->app;
 	while (1)
 	{
-		now = ph_get_now(app, ph_philo_quit);
+		now = ph_get_now(app, ph_process_exit);
 		time_to_death = (philo->last_eat + death_time) - now;
 		if (time_to_death <= 0)
 		{
 			ph_inform(philo, ac_die);
-			ph_philo_quit(app, EX_OK);
+			ph_process_exit(app, EX_OK);
 		}
-		ph_usleep(app, time_to_death, ph_philo_quit);
+		ph_usleep(app, time_to_death, ph_process_exit);
 	}
 	return (NULL);
 }
@@ -63,15 +63,18 @@ int
 	while (1)
 	{
 		ph_inform(philo, ac_think);
-		ph_sem_wait(app, philo->fork_sem, ph_philo_quit);
+		ph_sem_wait(app, philo->fork_sem, ph_process_exit);
 		ph_inform(philo, ac_take_fork);
 		ph_inform(philo, ac_take_fork);
 		ph_inform(philo, ac_eat);
-		philo->last_eat = ph_get_now(app, ph_philo_quit);
-		ph_usleep(app, eat_time, ph_philo_quit);
-		ph_sem_post(app, philo->fork_sem, ph_philo_quit);
+		philo->last_eat = ph_get_now(app, ph_process_exit);
+		philo->eat_count += (philo->eat_count < app->attr->min_eat);
+		if (philo->eat_count == app->attr->min_eat)
+			ph_sem_post(app, app->eat_sem, ph_process_exit);
+		ph_usleep(app, eat_time, ph_process_exit);
+		ph_sem_post(app, philo->fork_sem, ph_process_exit);
 		ph_inform(philo, ac_sleep);
-		ph_usleep(app, sleep_time, ph_philo_quit);
+		ph_usleep(app, sleep_time, ph_process_exit);
 	}
 	return (0);
 }

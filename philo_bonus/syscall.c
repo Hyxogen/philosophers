@@ -19,11 +19,7 @@ int
 	if (rc < 0)
 	{
 		if (errno != ENOENT && errno != EINVAL)
-		{
-			fprintf(stderr, "Failed to sem_unlink(%d): %s\n", errno, strerror(errno));
-			fprintf(stderr, "Argument was \"%s\"\n", name);
 			exit(EX_OSERR);
-		}
 	}
 	return (rc);
 }
@@ -50,10 +46,7 @@ void
 		if (rc < 0)
 		{
 			if (errno != EINTR)
-			{
-				fprintf(stderr, "sem_wait failed(%d): %s\n", errno, strerror(errno));
 				exception_proc(app, EX_OSERR);
-			}
 			continue;
 		}
 		break;
