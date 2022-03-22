@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 #ifndef PH_EXPIRE_CHECK_INTERVAL
-# define PH_EXPIRE_CHECK_INTERVAL 10
+# define PH_EXPIRE_CHECK_INTERVAL 100
 #endif
 
 void
@@ -52,7 +52,7 @@ void
 			ph_inform(philo, ac_die);
 			ph_process_exit(app, EX_OK);
 		}
-		ph_usleep(app, 10, ph_process_exit);
+		ph_usleep(app, PH_EXPIRE_CHECK_INTERVAL, ph_process_exit);
 	}
 	return (NULL);
 }
