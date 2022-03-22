@@ -48,15 +48,17 @@ void
 void
 	ph_interval_sleep(t_app *app, useconds_t microseconds)
 {
+	long	done;
 	long	now;
 
+	done = microseconds;
 	now = ph_get_now(app, ph_process_exit);
-	microseconds += now;
-	while (now < microseconds)
+	done += now;
+	while (now < done)
 	{
-		if (now + PH_INTER >= microseconds)
+		if (now + PH_INTER >= done)
 		{
-			ph_usleep(app, microseconds - now, ph_process_exit);
+			ph_usleep(app, done - now, ph_process_exit);
 			return ;
 		}
 		else
