@@ -10,7 +10,7 @@ long
 
 	if (gettimeofday(&val, NULL) < 0)
 		exception_proc(app, EX_OSERR);
-	return ((((val.tv_sec * 1000000) + val.tv_usec) / 1000) * 1000);
+	return ((val.tv_sec * 1000000) + val.tv_usec);
 }
 
 long
