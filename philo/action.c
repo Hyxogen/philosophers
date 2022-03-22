@@ -60,6 +60,11 @@ int
 	ph_inform(philo, ac_start_eat);
 	now = ph_get_now();
 	philo->eat_count += 1;
+	if (now < 0)
+		return (-1);
+	philo->last_eat = now;
+	if (ph_philo_usleep(philo, philo->attr->eat_time))
+		return (1);
 	if (philo->attr->min_eat >= 0
 		&& (long) philo->eat_count == philo->attr->min_eat)
 	{
@@ -70,11 +75,6 @@ int
 			philo->app->state = -1;
 		pthread_mutex_unlock(&philo->app->global_mtx);
 	}
-	if (now < 0)
-		return (-1);
-	philo->last_eat = now;
-	if (ph_philo_usleep(philo, philo->attr->eat_time))
-		return (1);
 	return (ph_philo_is_dead(philo));
 }
 
