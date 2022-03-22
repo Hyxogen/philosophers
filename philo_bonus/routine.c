@@ -84,9 +84,9 @@ int
 		ph_inform(philo, ac_eat);
 		ph_philo_set_last_eat(app, philo, ph_get_now(app, ph_process_exit));
 		philo->eat_count += (philo->eat_count <= app->attr->min_eat);
+		ph_interval_sleep(app, eat_time);
 		if (philo->eat_count == app->attr->min_eat)
 			ph_sem_post(app, app->eat_sem, ph_process_exit);
-		ph_interval_sleep(app, eat_time);
 		ph_inform(philo, ac_sleep);
 		ph_sem_post(app, philo->fork_sem, ph_process_exit);
 		ph_interval_sleep(app, sleep_time);
