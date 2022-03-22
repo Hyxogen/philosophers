@@ -86,10 +86,10 @@ int
 		philo->eat_count += (philo->eat_count <= app->attr->min_eat);
 		if (philo->eat_count == app->attr->min_eat)
 			ph_sem_post(app, app->eat_sem, ph_process_exit);
-		ph_usleep(app, eat_time, ph_process_exit);
+		ph_interval_sleep(app, eat_time);
 		ph_inform(philo, ac_sleep);
 		ph_sem_post(app, philo->fork_sem, ph_process_exit);
-		ph_usleep(app, sleep_time, ph_process_exit);
+		ph_interval_sleep(app, sleep_time);
 	}
 	return (0);
 }

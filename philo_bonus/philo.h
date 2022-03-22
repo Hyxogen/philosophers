@@ -23,6 +23,10 @@
 #  define PH_PHILO_BIN_SEM "phphilobinsem"
 # endif
 
+# ifndef PH_INTER
+#  define PH_INTER 500
+# endif
+
 typedef enum e_action {
 	ac_take_fork,
 	ac_eat,
@@ -89,6 +93,7 @@ void	ph_app_quit(t_app *app, int status);
 
 void	ph_usleep(t_app *app, useconds_t microseconds,
 			t_exception_proc exception_proc);
+void	ph_interval_sleep(t_app *app, useconds_t microseconds);
 long	ph_get_now(t_app *app, t_exception_proc exception_proc);
 long	ph_get_timestamp(t_app *app, t_exception_proc exception_proc);
 void	ph_sem_wait(t_app *app, sem_t *sem, t_exception_proc exception_proc);

@@ -44,3 +44,23 @@ void
 		childs++;
 	}
 }
+
+void
+	ph_interval_sleep(t_app *app, useconds_t microseconds)
+{
+	long	now;
+
+	now = ph_get_now(app, ph_process_exit);
+	microseconds += now;
+	while (now < microseconds)
+	{
+		if (now + PH_INTER >= microseconds)
+		{
+			ph_usleep(app, microseconds - now, ph_process_exit);
+			return ;
+		}
+		else
+			ph_usleep(app, PH_INTER, ph_process_exit);
+		now = ph_get_now(app, ph_process_exit);
+	}
+}
