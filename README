@@ -2,8 +2,7 @@ Philosophers
 ============
 Philosophers is a 42 core curriculum project for learning about
 threads, mutexes and semaphores by solving a slightly modified version
-of the dining
-philosophers problem
+of the dining philosophers problem
 (https://en.wikipedia.org/wiki/Dining_philosophers_problem).
 
 Overview
