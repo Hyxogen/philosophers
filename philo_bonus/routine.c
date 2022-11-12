@@ -12,7 +12,7 @@
 void
 	ph_inform(t_philo *philo, t_action action)
 {
-	const static char	*messages[] = {
+	static const char	*messages[] = {
 		"%d %d has taken a fork\n",
 		"%d %d is eating\n",
 		"%d %d is thinking\n",
