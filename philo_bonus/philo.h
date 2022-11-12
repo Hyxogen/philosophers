@@ -1,6 +1,7 @@
 #ifndef PHILO_H
 # define PHILO_H
 
+# include <unistd.h>
 # include <sys/types.h>
 # include <semaphore.h>
 
