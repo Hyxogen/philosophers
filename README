@@ -81,7 +81,7 @@ memset, printf, malloc, free, write, usleep, gettimeofday,
 pthread_create, pthread_detach, pthread_join, pthread_mutex_init,
 pthread_mutex_destroy, pthread_mutex_lock, pthread_mutex_unlock
 
-My Mandatory solution
+My mandatory solution
 ============
 x All philosophers always try to take both forks, and hold them for as
   long as is needed (this means that they won't drop a fork if the
