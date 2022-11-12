@@ -1,7 +1,7 @@
 NAME		:= philo_bonus
 
 CC		:= cc
-LINK_CMD	:= CC
+LINK_CMD	:= cc
 CFLAGS		:= -Wall -Wextra
 LFLAGS		:=
 
@@ -19,6 +19,10 @@ endif
 
 ifndef config
 	config	:= distr
+endif
+
+ifeq ($(shell uname -s),Linux)
+	CFLAGS	+= -DPH_LINUX
 endif
 
 ifeq ($(config), debug)

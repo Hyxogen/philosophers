@@ -3,7 +3,11 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <errno.h>
-#include <sys/semaphore.h>
+#ifdef PH_LINUX
+# include <semaphore.h>
+#else
+# include <sys/semaphore.h>
+#endif
 #include <sysexits.h>
 #include <unistd.h>
 

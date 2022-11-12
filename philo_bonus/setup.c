@@ -5,6 +5,7 @@
 #include <sysexits.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <fcntl.h>
 
 void
 	ph_philo_new(t_philo *philo, int id, t_app *app)
