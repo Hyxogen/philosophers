@@ -1,0 +1,115 @@
+Philosophers
+============
+Philosophers is a 42 core curriculum project for learning about
+threads, mutexes and semaphores by solving a slightly modified version
+of the dining
+philosophers problem
+(https://en.wikipedia.org/wiki/Dining_philosophers_problem).
+
+Overview
+============
+x One or more philosophers sit at a round table.
+  There is a large bowl of spaghetti in the middle of the table.
+x The philosophers alternatively eat, think, or sleep.  While they are
+  eating, they are not thinking nor sleeping; while thinking, they are
+  not eating nor sleeping; and, of course, while sleeping, they are
+  not eating nor thinking.
+x There are also forks on the table. There are as many forks as
+  philosophers
+x Because serving and eating spaghetti with only one fork is very
+  inconvenient, a philosopher takes their right and their left forks to
+  eat, one in each hand.
+x When a philosopher has finished eating, they put their forks back on
+  the table and start sleeping. Once awake, they start thinking
+  again. The simulation stops when a philosopher dies of starvation.
+x Every philosopher needs to eat and should never starve.
+x Philosophers don’t speak with each other.
+x Philosophers don’t know if another philosopher is about to die.
+x No need to say that philosophers should avoid dying!
+
+Global rules
+============
+x Global variables are forbidden
+x The program must take the following arguments:
+  number_of_philosophers time_to_die time_to_eat time_to_sleep
+  [number_of_times_each_philosopher_must_eat]
+  x number_of_philosophers: the number of philosophers and also the
+    number of forks
+  x time_to_die (in milliseconds): if a philosopher didn't start eating
+    time_to_die milliseconds since the beginning of their last meal, or
+    the beginning of the simulation, the philosopher dies
+  x time_to_eat (in milliseconds): the time it takes for a philosopher
+    to eat. During this time, the philosopher will need to hold two
+    forks
+  x time_to_sleep (in milliseconds): the time a philosopher will spend
+    sleeping
+  x number_of_times_each_philosopher_must_eat (optional): if all
+    philosophers have eaten at least
+    number_of_times_each_philosopher_must_eat times, then the
+    simulation stops. If not specified, the simulation stops when a
+    philosopher dies
+x Each philosopher has a number ranged from 1 to
+  number_of_philosophers
+x Philosopher number 1 sits next to philosopher
+  number_of_philosophers. Any other philosopher number N sits between
+  philosopher number N - 1 and philosopher number N + 1
+x Any state change of a philosopher must be formatted as follows:
+  x timestamp_in_ms X has taken a fork
+  x timestamp_in_ms X is eating
+  x timestamp_in_ms X is sleeping
+  x timestamp_in_ms X is thinking
+  x timestamp_in_ms X died
+  (with timestamp_in_ms replaced by the current timestamp in
+  milliseconds and X with the philosopher number)
+x A displayed state message should not be mixed up with another
+  message.
+x A message announcing a philosopher died should be displayed within
+  10 ms after the actual death of the philosopher
+x Philosophers should avoid dying
+
+Mandatory part rules
+============
+x Each philosophers should be a thread
+x There is one fork between each pair of philosophers, Therefore, if
+  there are several philosophers, each philosopher has a fork on their
+  left side and a fore on their right side. If there is only one
+  philosopher, there should be only one fork on the table
+x To prevent philosophers from duplicating forks, you should protect
+  the forks state with a mutex for each of them
+
+Allowed external functions:
+memset, printf, malloc, free, write, usleep, gettimeofday,
+pthread_create, pthread_detach, pthread_join, pthread_mutex_init,
+pthread_mutex_destroy, pthread_mutex_lock, pthread_mutex_unlock
+
+My Mandatory solution
+============
+x All philosophers always try to take both forks, and hold them for as
+  long as is needed (this means that they won't drop a fork if the
+  other side isn't available)
+x All uneven philosophers will sleep `eat_time` at the beginning of
+  the project
+
+Bonus part rules
+============
+x All forks are put in the middle of the table
+x They have no states in memory but the number of available forks is
+  represented by a semaphore
+x Each philosopher should be a process, but the main process should
+  not be a philosopher
+
+Allowed external functions:
+memset, printf, malloc, free, write, fork, kill, exit, pthread_create,
+pthread_detach, pthread_join, usleep, gettimeofday, waitpid, sem_open,
+sem_close, sem_post, sem_wait, sem_unlink
+
+My bonus solution
+============
+For the bonus I just let all the philosophers loose and try to take
+forks as they see fit as that seems to be the best solution when the
+pile of forks is in the middle.
+
+Special Thanks
+============
+Special Thanks to dnoom and mjoosten for pointing out that philosopher
+ids should start at 1 and not at 0
