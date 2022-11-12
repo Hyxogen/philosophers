@@ -1,9 +1,8 @@
 NAME		:= philo_bonus
 
-CC			:= clang
-LINK_CMD	:= clang
-
-CFLAGS		:= -std=c89 -Wall -Wextra -Werror -pedantic
+CC		:= cc
+LINK_CMD	:= CC
+CFLAGS		:= -Wall -Wextra
 LFLAGS		:=
 
 SRC_DIR		:= .
@@ -41,11 +40,11 @@ endif
 
 all: $(NAME)
 $(NAME): $(OBJ_FILES)
-	@echo Linking $(NAME)...
+	@echo LINK_CMD $(NAME)...
 	$(SILENT)$(LINK_CMD) -o $(NAME) $(OBJ_FILES) $(LFLAGS)
 
 $(OBJ_DIR)/%.o: %.c
-	@echo $(notdir $<)
+	@echo CC $(notdir $<)
 	$(SILENT)mkdir -p $(OBJ_DIR)
 	$(SILENT)$(CC) $(CFLAGS) -o $@ -c $<
 
